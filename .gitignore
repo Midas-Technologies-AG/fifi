@@ -1,2 +1,5 @@
+# Ignore build related files
+target/
+
 # Emacs related:
 *~
