@@ -11,7 +11,7 @@ lazy val Versions = new {
 val minimalSettings: Seq[Def.Setting[_]] = Seq(
   organization := "social.midas",
   scalaVersion := Versions.scala,
-  version := "0.3.0",
+  version := "0.1.0",
   // Enable full stack-traces when running tests:
   //testOptions in Test += Tests.Argument("-oF"),
   parallelExecution in Test := true,
@@ -35,6 +35,8 @@ val minimalSettings: Seq[Def.Setting[_]] = Seq(
     log4jCore,
     log4jApi,
     log4jApiScala,
+    circeLiteral     % Test,
+    circeParser      % Test,
     scalacheck       % Test,
     specs2Core       % Test,
     specs2Scalacheck % Test,
@@ -52,9 +54,18 @@ lazy val `aws-wrapper` = (project in file("aws-wrapper"))
       newAwsSdkEc2,
       newAwsSdkEcs,
       newAwsSdkUtils,
-      circeLiteral % Test,
-      circeParser % Test,
     ),
+  )
+
+lazy val `discovery-aws` = (project in file("discovery-aws"))
+  .settings(
+    minimalSettings,
+    libraryDependencies ++= Seq(
+      sangria,
+      sangriaCirce,
+    ),
+  ).dependsOn(
+    `aws-wrapper`,
   )
 
 lazy val catsEffect     = "org.typelevel"            %% "cats-effect"      % "0.10.1"
@@ -70,6 +81,8 @@ lazy val newAwsSdkCore  = "software.amazon.awssdk"   %  "core"             % "2.
 lazy val newAwsSdkEc2   = "software.amazon.awssdk"   %  "ec2"              % newAwsSdkCore.revision
 lazy val newAwsSdkEcs   = "software.amazon.awssdk"   %  "ecs"              % newAwsSdkCore.revision
 lazy val newAwsSdkUtils = "software.amazon.awssdk"   %  "utils"            % newAwsSdkCore.revision
+lazy val sangria        = "org.sangria-graphql"      %% "sangria"          % "1.4.0"
+lazy val sangriaCirce   = "org.sangria-graphql"      %% "sangria-circe"    % "1.2.1"
 
 // Testing libraries:
 lazy val scalacheck       = "org.scalacheck" %% "scalacheck"        % "1.14.0"
