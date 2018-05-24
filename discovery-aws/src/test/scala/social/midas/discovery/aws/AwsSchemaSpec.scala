@@ -5,34 +5,20 @@ package social.midas.discovery.aws
 
 import io.circe.{ Decoder, Json }
 import org.specs2.concurrent.ExecutionEnv
-import org.specs2.execute.{ AsResult, Result }
 import org.specs2.mutable.Specification
-import org.specs2.specification.ForEach
 import sangria.execution._
 import sangria.macros._
 import sangria.marshalling.circe._
 import scala.concurrent.duration._
 import scala.concurrent.{ Await, Future }
 import scala.util.matching.Regex
-import software.amazon.awssdk.core.regions.Region
 
 import social.midas.wrapper.aws.ec2.Ec2Instance
 import social.midas.wrapper.aws.ecs.{ EcsCluster, EcsTask }
 
-trait WithAwsClients extends ForEach[AwsClients] {
-  def foreach[R: AsResult](f: AwsClients => R): Result = {
-    val client = new AwsClients(Region.EU_CENTRAL_1)
-    try {
-      AsResult(f(client))
-    } finally {
-      client.close
-    }
-  }
-}
-
 class AwsSchemaSpec(implicit ee: ExecutionEnv)
     extends Specification
-    with WithAwsClients {
+    with WithAwsContext {
 
   val nonExistentRegex = new Regex("non-existent")
 
@@ -44,34 +30,34 @@ class AwsSchemaSpec(implicit ee: ExecutionEnv)
 
   "ecs" >> {
     "general ecs listings" >> {
-      "get all ecsClusters" >> { clients: AwsClients =>
+      "get all ecsClusters" >> { ctx: AwsContext =>
         val query = graphql"""
 query SomeEcsCluster {
   ecsClusters { arn }
 }
       """
         val result = extractClustersFromFutureJson[Seq[EcsCluster]](
-          Executor.execute(AwsSchema.schema, query, clients)
+          Executor.execute(AwsSchema.schema, query, ctx)
         )
         result must beRight
         result.right must not be empty
       }
 
-      "filter ecsClusters" >> { clients: AwsClients =>
+      "filter ecsClusters" >> { ctx: AwsContext =>
         val query = graphql"""
 query SomeEcsCluster {
   ecsClusters(filterArn: "non-existent-cluster") { arn }
 }
       """
         val result = extractClustersFromFutureJson[Seq[EcsCluster]](
-          Executor.execute(AwsSchema.schema, query, clients)
+          Executor.execute(AwsSchema.schema, query, ctx)
         )
         result must_== Right(Seq())
       }
     }
 
     "services" >> {
-      "get from ecsClusters" >> { clients: AwsClients =>
+      "get from ecsClusters" >> { ctx: AwsContext =>
         val query = graphql"""
 query ContainerQuery {
   ecsClusters {
@@ -84,7 +70,7 @@ query ContainerQuery {
 }
       """
         val result = extractClustersFromFutureJson[Seq[EcsCluster]](
-          Executor.execute(AwsSchema.schema, query, clients)
+          Executor.execute(AwsSchema.schema, query, ctx)
         )
         
         result must beRight
@@ -94,7 +80,7 @@ query ContainerQuery {
     }
 
     "tasks" >> {
-      "get from ecsClusters" >> { clients: AwsClients =>
+      "get from ecsClusters" >> { ctx: AwsContext =>
         val query = graphql"""
 query ContainerQuery {
   ecsClusters {
@@ -107,7 +93,7 @@ query ContainerQuery {
 }
       """
         val result = extractClustersFromFutureJson[Seq[EcsCluster]](
-          Executor.execute(AwsSchema.schema, query, clients)
+          Executor.execute(AwsSchema.schema, query, ctx)
         )
         
         result must beRight
@@ -115,7 +101,7 @@ query ContainerQuery {
         result.right.get.head.tasks.get must not be empty
       }
 
-      "completely resolving a task" >> { clients: AwsClients =>
+      "completely resolving a task" >> { ctx: AwsContext =>
         val query = graphql"""
 query ContainerQuery {
   ecsClusters {
@@ -143,7 +129,7 @@ query ContainerQuery {
 }
       """
         val fut =
-          Executor.execute(AwsSchema.schema, query, clients, deferredResolver=Fetchers.resolver)
+          Executor.execute(AwsSchema.schema, query, ctx, deferredResolver=Fetchers.resolver)
 
         val doc: Json = Await.result(fut, 10.second)
         val cursor = doc.hcursor
@@ -157,7 +143,7 @@ query ContainerQuery {
         parsed.right.get must not be empty
       }
 
-      "get private ip address of a task" >> { clients: AwsClients =>
+      "get private ip address of a task" >> { ctx: AwsContext =>
         val query = graphql"""
 query {
   ecsClusters {
@@ -172,7 +158,7 @@ query {
 }
 """
         val fut = Executor.execute(
-          AwsSchema.schema, query, clients, deferredResolver=Fetchers.resolver,
+          AwsSchema.schema, query, ctx, deferredResolver=Fetchers.resolver,
         )
         val doc: Json = Await.result(fut, 10.second)
         val parsed = doc.hcursor.downField("data")
@@ -190,7 +176,7 @@ query {
     }
 
     "container instances" >> {
-      "get from ecsClusters" >> { clients: AwsClients =>
+      "get from ecsClusters" >> { ctx: AwsContext =>
         val query = graphql"""
 query ContainerQuery {
   ecsClusters {
@@ -203,7 +189,7 @@ query ContainerQuery {
 }
       """
         val result = extractClustersFromFutureJson[Seq[EcsCluster]](
-          Executor.execute(AwsSchema.schema, query, clients)
+          Executor.execute(AwsSchema.schema, query, ctx)
         )
         
         result must beRight
@@ -211,7 +197,7 @@ query ContainerQuery {
         result.right.get.head.containerInstances.get must not be empty
       }
 
-      "resolve instances ip address" >> { clients: AwsClients =>
+      "resolve instances ip address" >> { ctx: AwsContext =>
         val query = graphql"""
 query ContainerQuery {
   ecsClusters {
@@ -226,7 +212,7 @@ query ContainerQuery {
 }
 """
         val fut =
-          Executor.execute(AwsSchema.schema, query, clients, deferredResolver=Fetchers.resolver)
+          Executor.execute(AwsSchema.schema, query, ctx, deferredResolver=Fetchers.resolver)
 
         val doc: Json = Await.result(fut, 10.second)
         val cursor = doc.hcursor
@@ -238,13 +224,13 @@ query ContainerQuery {
           .as[String]
 
         parsed must beRight
-        parsed.right.get must startWith("172.")
+        parsed.right.get must be matching Ip4Regex
       }
     }
   }
 
   "ec2" >> {
-    "list instances" >> { clients: AwsClients =>
+    "list instances" >> { ctx: AwsContext =>
       val query = graphql"""
 query Ec2Instances {
   ec2Instances {
@@ -253,7 +239,7 @@ query Ec2Instances {
   }
 }
 """
-      val fut = Executor.execute(AwsSchema.schema, query, clients)
+      val fut = Executor.execute(AwsSchema.schema, query, ctx)
       val doc: Json = Await.result(fut, 10.seconds)
       val parsed = doc.hcursor.downField("data")
         .downField("ec2Instances")

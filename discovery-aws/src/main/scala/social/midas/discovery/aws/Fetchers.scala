@@ -27,9 +27,9 @@ object Fetchers {
 
   implicit val Ec2InstanceId = HasId[Ec2Instance, Ec2InstanceId](_.id)
 
-  val ec2DescribeInstances = Fetcher[AwsClients, Ec2Instance, Ec2InstanceId](
-    (clients: AwsClients, instances: Seq[Ec2InstanceId]) => {
-      clients.ec2.describeInstances(instances)
+  val ec2DescribeInstances = Fetcher[AwsContext, Ec2Instance, Ec2InstanceId](
+    (ctx: AwsContext, instances: Seq[Ec2InstanceId]) => {
+      ctx.clients.ec2.describeInstances(instances)
         .map(restoreOrder(instances))
         .unsafeToFuture()
     }
@@ -37,13 +37,13 @@ object Fetchers {
 
   implicit val EcsTaskId = HasId[EcsTask, EcsTaskArn](_.getFullArn) 
 
-  val ecsTaskDescriptions = Fetcher[AwsClients, EcsTask, EcsTaskArn](
-    (clients: AwsClients, tasks: Seq[EcsTaskArn]) => {
+  val ecsTaskDescriptions = Fetcher[AwsContext, EcsTask, EcsTaskArn](
+    (ctx: AwsContext, tasks: Seq[EcsTaskArn]) => {
       val byCluster = tasks.groupBy(_.clusterArn)
       Future.traverse(byCluster.toSeq)({
         case (cluster, tasksOfCluster) => {
           val arns = tasksOfCluster.map(_.arn)
-          clients.ecs.describeTasks(cluster, arns).unsafeToFuture()
+          ctx.clients.ecs.describeTasks(cluster, arns).unsafeToFuture()
         }
       })
         .map(_.flatten.toSeq)
@@ -55,15 +55,15 @@ object Fetchers {
     HasId[EcsContainerInstance, EcsContainerInstanceArn](_.getArnPath)
 
   val ecsContainerInstances = Fetcher[
-    AwsClients,
+    AwsContext,
     EcsContainerInstance,
     EcsContainerInstanceArn,
-  ]( (clients: AwsClients, instances: Seq[EcsContainerInstanceArn]) => {
+  ]( (ctx: AwsContext, instances: Seq[EcsContainerInstanceArn]) => {
     val byCluster = instances.groupBy(_.clusterArn)
     Future.traverse(byCluster.toSeq)({
       case (cluster, instancesOfCluster) => {
         val arns = instancesOfCluster.map(_.arn)
-        clients.ecs.describeContainerInstances(cluster, arns).unsafeToFuture()
+        ctx.clients.ecs.describeContainerInstances(cluster, arns).unsafeToFuture()
       }
     })
       .map(_.flatten.toSeq)
@@ -71,6 +71,6 @@ object Fetchers {
     }
   )
 
-  val resolver: DeferredResolver[AwsClients] =
+  val resolver: DeferredResolver[AwsContext] =
     DeferredResolver.fetchers(ecsContainerInstances, ecsTaskDescriptions, ec2DescribeInstances)
 }

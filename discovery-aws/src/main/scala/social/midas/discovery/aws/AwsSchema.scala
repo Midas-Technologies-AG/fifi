@@ -5,12 +5,15 @@ package social.midas.discovery.aws
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.matching.Regex
+import sangria.execution.FieldTag
 import sangria.schema._
 import sangria.macros.derive._
 
 import social.midas.wrapper.aws.generic.Arn
 import social.midas.wrapper.aws.ecs._
 import social.midas.wrapper.aws.ec2._
+
+case class Provides(data: String) extends FieldTag
 
 object AwsSchema {
 
@@ -35,9 +38,10 @@ object AwsSchema {
   implicit val Ec2InstanceIdType = ObjectType(
     "Ec2Instance",
     "Describes an EC2 instance.",
-    fields[AwsClients, Ec2InstanceId](
+    fields[AwsContext, Ec2InstanceId](
       Field("id", StringType, resolve = _.value.unwrap),
       Field("privateIpAddress", StringType,
+        tags = Provides("ip4") :: Nil,
         resolve = ctx => DeferredValue(
           Fetchers.ec2DescribeInstances.defer(ctx.value),
         ).map(_.privateIpAddress),
@@ -53,7 +57,7 @@ object AwsSchema {
   implicit val EcsContainerInstanceType = ObjectType(
     "EcsContainerInstance",
     "An EC2 instance that is running the Amazon ECS agent and has been registered with a cluster.",
-    fields[AwsClients, EcsContainerInstanceArn](
+    fields[AwsContext, EcsContainerInstanceArn](
       Field("arn", ArnType, resolve = _.value.arn),
       Field("clusterArn", EcsClusterArnType, resolve = _.value.clusterArn),
       Field("ec2Instance", Ec2InstanceIdType,
@@ -81,7 +85,7 @@ object AwsSchema {
   implicit val EcsTaskType = ObjectType(
     "EcsTask",
     "An ECS task",
-    fields[AwsClients, EcsTaskArn](
+    fields[AwsContext, EcsTaskArn](
       Field("arn", ArnType, resolve = _.value.arn),
       Field("clusterArn", EcsClusterArnType, resolve = _.value.clusterArn),
       Field("containerInstance", EcsContainerInstanceType,
@@ -91,7 +95,7 @@ object AwsSchema {
         ).map(_.containerInstance),
       ),
       Field("containers",
-        OptionType(ListType(EcsContainerType)),
+        ListType(EcsContainerType),
         description = Some("The containers associated with the task."),
         resolve = ctx => DeferredValue(
           Fetchers.ecsTaskDescriptions.defer(ctx.value)
@@ -114,33 +118,33 @@ object AwsSchema {
   implicit val EcsClusterType = ObjectType(
     "EcsCluster",
     "An AWS ECS cluster.",
-    fields[AwsClients, EcsClusterArn](
+    fields[AwsContext, EcsClusterArn](
       Field("arn", ArnType, resolve = _.value.arn),
       Field(
         "containerInstances",
-        OptionType(ListType(EcsContainerInstanceType)),
+        ListType(EcsContainerInstanceType),
         arguments = FilterArn :: Nil,
         description = Some("The list of containers of this cluster matching filterArn if specified."),
         resolve = { ctx =>
-          ctx.ctx.ecs.listContainerInstances(ctx.value, ctx.arg(FilterArn)).unsafeToFuture()
+          ctx.ctx.clients.ecs.listContainerInstances(ctx.value, ctx.arg(FilterArn)).unsafeToFuture()
         },
       ),
       Field(
         "services",
-        OptionType(ListType(EcsServiceType)),
+        ListType(EcsServiceType),
         arguments = FilterArn :: Nil,
         description = Some("The list of services of this cluster matching filterArn if specified."),
         resolve = { ctx =>
-          ctx.ctx.ecs.listServices(ctx.value, ctx.arg(FilterArn)).unsafeToFuture()
+          ctx.ctx.clients.ecs.listServices(ctx.value, ctx.arg(FilterArn)).unsafeToFuture()
         },
       ),
       Field(
         "tasks",
-        OptionType(ListType(EcsTaskType)),
+        ListType(EcsTaskType),
         arguments = FilterArn :: EcsTaskFamilyFilter :: Nil,
         description = Some("The list of tasks of this cluster matching filterArn if specified."),
         resolve = { ctx =>
-          ctx.ctx.ecs.listTasks(
+          ctx.ctx.clients.ecs.listTasks(
             ctx.value,
             ctx.arg(FilterArn),
             ctx.arg(EcsTaskFamilyFilter),
@@ -152,21 +156,21 @@ object AwsSchema {
 
   val RootDiscoveryType = ObjectType(
     "RootDiscovery",
-    fields[AwsClients, Unit](
+    fields[AwsContext, Unit](
       Field(
         "ecsClusters",
         ListType(EcsClusterType),
         arguments = FilterArn :: Nil,
         description = Some("The list of available ECS clusters."),
         resolve = { ctx =>
-          ctx.ctx.ecs.listClusters(ctx.arg(FilterArn)).unsafeToFuture()
+          ctx.ctx.clients.ecs.listClusters(ctx.arg(FilterArn)).unsafeToFuture()
         },
       ),
       Field(
         "ec2Instances",
         ListType(Ec2InstanceType),
         description = Some("The list of EC2 instances."),
-        resolve = _.ctx.ec2.describeInstances().unsafeToFuture(),
+        resolve = _.ctx.clients.ec2.describeInstances().unsafeToFuture(),
       ),
     )
   )
