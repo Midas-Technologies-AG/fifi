@@ -39,6 +39,7 @@ val minimalSettings: Seq[Def.Setting[_]] = Seq(
     circeParser      % Test,
     scalacheck       % Test,
     specs2Core       % Test,
+    specs2Junit      % Test,
     specs2Scalacheck % Test,
   ),
 )
@@ -87,4 +88,5 @@ lazy val sangriaCirce   = "org.sangria-graphql"      %% "sangria-circe"    % "1.
 // Testing libraries:
 lazy val scalacheck       = "org.scalacheck" %% "scalacheck"        % "1.14.0"
 lazy val specs2Core       = "org.specs2"     %% "specs2-core"       % "4.2.0"
+lazy val specs2Junit      = "org.specs2"     %% "specs2-junit"      % specs2Core.revision
 lazy val specs2Scalacheck = "org.specs2"     %% "specs2-scalacheck" % specs2Core.revision
