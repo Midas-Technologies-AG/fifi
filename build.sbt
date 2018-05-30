@@ -31,6 +31,8 @@ val minimalSettings: Seq[Def.Setting[_]] = Seq(
   scalacOptions in (Compile, console) ~= (_.filterNot (_ == "-Xlint")),
   doctestTestFramework := DoctestTestFramework.Specs2,
   fork in Test := true,
+  testOptions in Test +=
+    Tests.Argument(TestFrameworks.Specs2, "junitxml", "console"),
   libraryDependencies ++= Seq(
     log4jCore,
     log4jApi,
