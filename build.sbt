@@ -44,6 +44,29 @@ val minimalSettings: Seq[Def.Setting[_]] = Seq(
     specs2Junit      % Test,
     specs2Scalacheck % Test,
   ),
+  apiMappings ++= {
+    def findManagedDependency(organization: String, name: String): Option[File] = {
+      ( for {
+        entry <- (fullClasspath in Compile).value
+        module <- entry.get(moduleID.key)
+        if module.organization == organization
+        if module.name.startsWith(name)
+        jarFile = entry.data
+      } yield jarFile
+      ).headOption
+    }
+
+    val links = Seq(
+      findManagedDependency("org.scalacheck", "scalacheck")
+        .map(_ -> url(Seq(
+          "https://www.scalacheck.org/files",
+          s"scalacheck_${Versions.scalaMain}-${scalacheck.revision}-api/index.html",
+        ).mkString("/"))),
+      findManagedDependency("org.typelevel", "cats-effect")
+        .map(_ -> url("https://typelevel.org/cats-effect/api/")),
+    )
+    links.collect({ case Some(d) => d }).toMap
+  }
 )
 
 lazy val `aws-wrapper` = (project in file("aws-wrapper"))
