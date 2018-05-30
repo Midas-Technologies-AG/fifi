@@ -8,7 +8,7 @@ import org.specs2.mutable.Specification
 import org.specs2.specification.ForEach
 import org.specs2.mutable.Specification
 import scala.util.matching.Regex
-import software.amazon.awssdk.core.regions.Region
+import software.amazon.awssdk.regions.Region
 
 trait WithEcsClient extends ForEach[EcsClient] {
   def foreach[R: AsResult](f: EcsClient => R): Result = {

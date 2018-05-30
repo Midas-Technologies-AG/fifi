@@ -5,7 +5,7 @@ package social.midas.discovery.aws
 
 import org.specs2.execute.{ AsResult, Result }
 import org.specs2.specification.ForEach
-import software.amazon.awssdk.core.regions.Region
+import software.amazon.awssdk.regions.Region
 
 trait WithAwsContext extends ForEach[AwsContext] {
   def foreach[R: AsResult](f: AwsContext => R): Result = {

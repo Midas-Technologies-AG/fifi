@@ -8,8 +8,8 @@ import java.util.concurrent.{
  CancellationException, CompletableFuture, CompletionException,
 }
 import java.util.function.BiFunction
-import software.amazon.awssdk.core.client.builder.AsyncClientBuilder
-import software.amazon.awssdk.core.regions.Region
+import software.amazon.awssdk.awscore.client.builder.AwsClientBuilder
+import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.utils.SdkAutoCloseable
 
 /**
@@ -17,7 +17,7 @@ import software.amazon.awssdk.utils.SdkAutoCloseable
  * builder `B`.
  */
 abstract class AwsClient[
-  B <: AsyncClientBuilder[B,C],
+  B <: AwsClientBuilder[B,C],
   C <: SdkAutoCloseable,
 ] {
 

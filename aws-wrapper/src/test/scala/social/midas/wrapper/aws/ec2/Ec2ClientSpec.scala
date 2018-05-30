@@ -7,7 +7,7 @@ import cats.effect.IO
 import org.specs2.execute.{ AsResult, Result }
 import org.specs2.mutable.Specification
 import org.specs2.specification.ForEach
-import software.amazon.awssdk.core.regions.Region
+import software.amazon.awssdk.regions.Region
 
 trait WithEc2Client extends ForEach[Ec2Client] {
   def foreach[R: AsResult](f: Ec2Client => R): Result = {

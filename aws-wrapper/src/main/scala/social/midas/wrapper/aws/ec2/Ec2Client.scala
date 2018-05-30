@@ -5,7 +5,7 @@ package social.midas.wrapper.aws.ec2
 
 import cats.effect.IO
 import scala.collection.JavaConverters._
-import software.amazon.awssdk.core.regions.Region
+import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.ec2.{
   EC2AsyncClient, EC2AsyncClientBuilder,
 }

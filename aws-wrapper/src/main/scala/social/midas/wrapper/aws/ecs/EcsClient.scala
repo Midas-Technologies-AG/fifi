@@ -7,7 +7,7 @@ import cats.effect.IO
 import java.util.concurrent.CompletableFuture
 import scala.collection.JavaConverters._
 import scala.util.matching.Regex
-import software.amazon.awssdk.core.regions.Region
+import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.ecs.{
   ECSAsyncClient, ECSAsyncClientBuilder
 }

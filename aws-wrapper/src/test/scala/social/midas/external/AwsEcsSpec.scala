@@ -6,7 +6,7 @@ package social.midas.external
 import java.net.UnknownHostException
 import java.util.concurrent.ExecutionException
 import software.amazon.awssdk.core.exception.SdkClientException
-import software.amazon.awssdk.core.regions.Region.EU_CENTRAL_1
+import software.amazon.awssdk.regions.Region.EU_CENTRAL_1
 import software.amazon.awssdk.services.ecs.ECSAsyncClient
 import software.amazon.awssdk.services.ecs.model.{
   ListContainerInstancesRequest, ListServicesRequest,

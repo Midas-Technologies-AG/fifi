@@ -3,7 +3,7 @@
  */
 package social.midas.discovery.aws
 
-import software.amazon.awssdk.core.regions.Region
+import software.amazon.awssdk.regions.Region
 
 import social.midas.wrapper.aws.ec2.Ec2Client
 import social.midas.wrapper.aws.ecs.EcsClient
