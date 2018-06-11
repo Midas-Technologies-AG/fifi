@@ -25,5 +25,28 @@ pipeline {
         step([$class: 'ScoveragePublisher', reportDir: 'target/scala-2.12/scoverage-report', reportFile: 'scoverage.xml'])
       }
     }
+    stage('Generate and publish API documentation') {
+      steps {
+        sh "${sbt} doc"
+        publishHTML([
+          allowMissing: false,
+          alwaysLinkToLastBuild: false,
+          keepAll: false,
+          reportDir: 'aws-wrapper/target/scala-2.12/api',
+          reportFiles: 'index.html',
+          reportName: 'ScalaDoc aws-wrapper',
+          reportTitles: ''
+        ])
+        publishHTML([
+          allowMissing: false,
+          alwaysLinkToLastBuild: false,
+          keepAll: false,
+          reportDir: 'discovery-aws/target/scala-2.12/api',
+          reportFiles: 'index.html',
+          reportName: 'ScalaDoc discovery-aws',
+          reportTitles: ''
+        ])
+      }
+    }
   }
 }
