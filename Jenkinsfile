@@ -1,4 +1,5 @@
 def sbt="sbt -Dsbt.log.noformat=true"
+def scalaVersion="2.12"
 
 pipeline {
   agent any
@@ -22,7 +23,11 @@ pipeline {
         junit '*/target/test-reports/*.xml'
         sh "${sbt} coverageReport"
         sh "${sbt} coverageAggregate"
-        step([$class: 'ScoveragePublisher', reportDir: 'target/scala-2.12/scoverage-report', reportFile: 'scoverage.xml'])
+        step([
+          $class: 'ScoveragePublisher',
+          reportDir: "target/scala-${scalaVersion}/scoverage-report",
+          reportFile: 'scoverage.xml'
+        ])
       }
     }
     stage('Generate and publish API documentation') {
@@ -32,7 +37,7 @@ pipeline {
           allowMissing: false,
           alwaysLinkToLastBuild: false,
           keepAll: false,
-          reportDir: 'aws-wrapper/target/scala-2.12/api',
+          reportDir: "aws-wrapper/target/scala-${scalaVersion}/api",
           reportFiles: 'index.html',
           reportName: 'ScalaDoc aws-wrapper',
           reportTitles: ''
@@ -41,11 +46,17 @@ pipeline {
           allowMissing: false,
           alwaysLinkToLastBuild: false,
           keepAll: false,
-          reportDir: 'discovery-aws/target/scala-2.12/api',
+          reportDir: "discovery-aws/target/scala-${scalaVersion}/api",
           reportFiles: 'index.html',
           reportName: 'ScalaDoc discovery-aws',
           reportTitles: ''
         ])
+      }
+    }
+    stage('Generate and archive JAR') {
+      steps {
+        sh "${sbt} package"
+        archiveArtifacts "*/target/scala-${scalaVersion}/*.jar"
       }
     }
   }
