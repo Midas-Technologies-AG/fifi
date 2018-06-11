@@ -17,5 +17,13 @@ pipeline {
         sh "${sbt} coverage test"
       }
     }
+    stage('Publish test reports') {
+      steps {
+        junit '*/target/test-reports/*.xml'
+        sh "${sbt} coverageReport"
+        sh "${sbt} coverageAggregate"
+        step([$class: 'ScoveragePublisher', reportDir: 'target/scala-2.12/scoverage-report', reportFile: 'scoverage.xml'])
+      }
+    }
   }
 }
