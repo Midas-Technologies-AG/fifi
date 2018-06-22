@@ -18,46 +18,49 @@ pipeline {
         sh "${sbt} coverage test"
       }
     }
-    stage('Publish test reports') {
-      steps {
-        junit '*/target/test-reports/*.xml'
-        sh "${sbt} coverageReport"
-        sh "${sbt} coverageAggregate"
-        step([
-          $class: 'ScoveragePublisher',
-          reportDir: "target/scala-${scalaVersion}/scoverage-report",
-          reportFile: 'scoverage.xml'
-        ])
-      }
-    }
-    stage('Generate and publish API documentation') {
+    stage('Generate API documentation') {
       steps {
         sh "${sbt} doc"
-        publishHTML([
-          allowMissing: false,
-          alwaysLinkToLastBuild: false,
-          keepAll: false,
-          reportDir: "aws-wrapper/target/scala-${scalaVersion}/api",
-          reportFiles: 'index.html',
-          reportName: 'ScalaDoc aws-wrapper',
-          reportTitles: ''
-        ])
-        publishHTML([
-          allowMissing: false,
-          alwaysLinkToLastBuild: false,
-          keepAll: false,
-          reportDir: "discovery-aws/target/scala-${scalaVersion}/api",
-          reportFiles: 'index.html',
-          reportName: 'ScalaDoc discovery-aws',
-          reportTitles: ''
-        ])
       }
     }
-    stage('Generate and archive JAR') {
+    stage('Generate JAR') {
       steps {
         sh "${sbt} package"
-        archiveArtifacts "*/target/scala-${scalaVersion}/*.jar"
       }
+    }
+  }
+  post {
+    always {
+      junit '*/target/test-reports/*.xml'
+      sh "${sbt} coverageReport"
+      sh "${sbt} coverageAggregate"
+      step([
+        $class: 'ScoveragePublisher',
+        reportDir: "target/scala-${scalaVersion}/scoverage-report",
+        reportFile: 'scoverage.xml'
+      ])
+    }
+
+    success {
+      archiveArtifacts "*/target/scala-${scalaVersion}/*.jar"
+      publishHTML([
+        allowMissing: false,
+        alwaysLinkToLastBuild: false,
+        keepAll: false,
+        reportDir: "discovery-aws/target/scala-${scalaVersion}/api",
+        reportFiles: 'index.html',
+        reportName: 'ScalaDoc discovery-aws',
+        reportTitles: ''
+      ])
+      publishHTML([
+        allowMissing: false,
+        alwaysLinkToLastBuild: false,
+        keepAll: false,
+        reportDir: "aws-wrapper/target/scala-${scalaVersion}/api",
+        reportFiles: 'index.html',
+        reportName: 'ScalaDoc aws-wrapper',
+        reportTitles: ''
+      ])
     }
   }
 }
