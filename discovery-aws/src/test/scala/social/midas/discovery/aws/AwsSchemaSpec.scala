@@ -15,6 +15,7 @@ import scala.util.matching.Regex
 
 import social.midas.wrapper.aws.ec2.Ec2Instance
 import social.midas.wrapper.aws.ecs.{ EcsCluster, EcsTask }
+import social.midas.test.Regex.Ip4Regex
 
 class AwsSchemaSpec(implicit ee: ExecutionEnv)
     extends Specification

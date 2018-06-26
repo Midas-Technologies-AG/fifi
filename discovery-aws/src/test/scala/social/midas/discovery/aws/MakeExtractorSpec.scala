@@ -11,6 +11,8 @@ import scala.collection.immutable.{ ListMap, Vector }
 import scala.concurrent.duration._
 import scala.concurrent.Await
 
+import social.midas.test.Regex.Ip4Regex
+
 class ExtractorsSpec(implicit ee: ExecutionEnv)
     extends Specification
     with WithAwsContext {
