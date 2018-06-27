@@ -75,6 +75,7 @@ lazy val `aws-wrapper` = (project in file("aws-wrapper"))
     libraryDependencies ++= Seq(
       catsEffect,
       circeGeneric,
+      config,
       log4jSlf4jImpl,
       newAwsSdkCore,
       newAwsSdkEc2,
@@ -99,6 +100,7 @@ lazy val circeCore      = "io.circe"                 %% "circe-core"       % "0.
 lazy val circeGeneric   = "io.circe"                 %% "circe-generic"    % circeCore.revision
 lazy val circeLiteral   = "io.circe"                 %% "circe-literal"    % circeCore.revision
 lazy val circeParser    = "io.circe"                 %% "circe-parser"     % circeCore.revision
+lazy val config         = "com.typesafe"             %  "config"           % "1.3.3"
 lazy val log4jApi       = "org.apache.logging.log4j" %  "log4j-api"        % log4jCore.revision
 lazy val log4jApiScala  = "org.apache.logging.log4j" %% "log4j-api-scala"  % "11.0"
 lazy val log4jCore      = "org.apache.logging.log4j" %  "log4j-core"       % "2.11.0"
