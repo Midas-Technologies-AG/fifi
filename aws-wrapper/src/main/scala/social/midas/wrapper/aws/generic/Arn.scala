@@ -7,7 +7,7 @@ import io.circe.{ Decoder, Encoder, HCursor, Json }
 import scala.util.matching.Regex
 
 /**
- * Define basic operations we need on all ARN like objects.
+ * Define basic operations we need on all ARN-like objects.
  */
 trait ArnLike {
 
@@ -28,7 +28,7 @@ trait ArnLike {
 }
 
 /**
- * A thin wrapper around an ARN.
+ * A thin wrapper around an ARN (Amazon Resource Name).
  * 
  * == JSON Deserialization ==
  * 
