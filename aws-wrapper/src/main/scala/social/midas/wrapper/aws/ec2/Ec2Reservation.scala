@@ -24,19 +24,34 @@ import software.amazon.awssdk.services.ec2.model.Reservation
  * res0: io.circe.Decoder.Result[Ec2ReservationId] = Right(Ec2ReservationId(foo))
  * }}}
  */
-sealed case class Ec2ReservationId(unwrap: String)
+final case class Ec2ReservationId(unwrap: String)
 
 object Ec2ReservationId {
-  implicit val enc: Encoder[Ec2ReservationId] = new Encoder[Ec2ReservationId] {
-    final def apply(x: Ec2ReservationId): Json = Json.fromString(x.unwrap)
-  }
-  implicit val dec: Decoder[Ec2ReservationId] = new Decoder[Ec2ReservationId] {
-    final def apply(c: HCursor): Decoder.Result[Ec2ReservationId] =
-      c.as[String].map(Ec2ReservationId(_))
-  }
+
+  /**
+   * JSON encoder which simply unwraps the string (thin wrapper).
+   */
+  implicit val enc: Encoder[Ec2ReservationId] =
+    new Encoder[Ec2ReservationId] {
+      final def apply(x: Ec2ReservationId): Json =
+        Json.fromString(x.unwrap)
+    }
+
+  /**
+   * JSON decoder which simply wraps up a string (thin wrapper).
+   */
+  implicit val dec: Decoder[Ec2ReservationId] =
+    new Decoder[Ec2ReservationId] {
+      final def apply(c: HCursor): Decoder.Result[Ec2ReservationId] =
+        c.as[String].map(Ec2ReservationId(_))
+    }
 }
 
-sealed case class Ec2Reservation(
+/**
+ * An EC2 reservation. Reservations basically group together one or
+ * more EC2 instances.
+ */
+final case class Ec2Reservation(
   id: Ec2ReservationId,
   instances: Seq[Ec2Instance],
 )
@@ -48,6 +63,11 @@ object Ec2Reservation {
       r.instances().asScala.toSeq.map(Ec2Instance(_)),
     )
 
-  implicit val dec: Decoder[Ec2Reservation] = deriveDecoder[Ec2Reservation]
-  implicit val enc: Encoder[Ec2Reservation] = deriveEncoder[Ec2Reservation]
+  /** JSON decoder. */
+  implicit val dec: Decoder[Ec2Reservation] =
+    deriveDecoder[Ec2Reservation]
+
+  /** JSON encoder. */
+  implicit val enc: Encoder[Ec2Reservation] =
+    deriveEncoder[Ec2Reservation]
 }

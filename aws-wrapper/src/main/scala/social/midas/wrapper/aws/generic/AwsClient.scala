@@ -13,7 +13,7 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.utils.SdkAutoCloseable
 
 /**
- * Generic abstraction of AWS an async client of type `C` with a
+ * Generic abstraction of an AWS async client of type `C` with a
  * builder `B`.
  */
 abstract class AwsClient[
@@ -21,7 +21,14 @@ abstract class AwsClient[
   C <: SdkAutoCloseable,
 ] {
 
+  /**
+   * The region the client should carry out operations in.
+   */
   def region: Region
+
+  /**
+   * The builder of this client.
+   */
   protected def builder: B
 
   private lazy val client: C = builder.region(region).build()

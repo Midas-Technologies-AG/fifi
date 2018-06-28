@@ -11,15 +11,23 @@ import software.amazon.awssdk.services.ec2.{
 }
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesRequest
 
+import social.midas.wrapper.aws
 import social.midas.wrapper.aws.generic.AwsClient
 
+/**
+ * A wrapper for
+ * [[software.amazon.awssdk.services.ec2.EC2AsyncClient]].
+ */
 case class Ec2Client(region: Region)
     extends AwsClient[EC2AsyncClientBuilder, EC2AsyncClient] {
 
   protected def builder = EC2AsyncClient.builder()
 
   /**
-   * This is the `describeInstances` method in AWS SDK.
+   * Fetches the description of EC2 instances grouped by their
+   * reservations.
+   * 
+   * @param ids Only fetch EC2 instances having these instance ids.
    */
   def describeInstancesByReservation(ids: Seq[Ec2InstanceId] = Seq())
       : IO[Seq[Ec2Reservation]] = {
@@ -32,7 +40,20 @@ case class Ec2Client(region: Region)
     )
   }
 
+  /**
+   * Fetches the description of EC2 instances as in
+   * [[describeInstancesByReservation]] but flattens the result to
+   * only contain [[Ec2Instance]]s.
+   */
   def describeInstances(ids: Seq[Ec2InstanceId] = Seq())
       : IO[Seq[Ec2Instance]] =
     describeInstancesByReservation(ids).map(_.map(_.instances).flatten)
+}
+
+object Ec2Client {
+
+  /**
+   * Build an [[Ec2Client]] using [[aws.region]].
+   */
+  def apply(): Ec2Client = Ec2Client(aws.region)
 }
