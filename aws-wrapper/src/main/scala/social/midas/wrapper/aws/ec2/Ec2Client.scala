@@ -9,8 +9,9 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.ec2.{
   EC2AsyncClient, EC2AsyncClientBuilder,
 }
-import software.amazon.awssdk.services.ec2.model.DescribeInstancesRequest
-
+import software.amazon.awssdk.services.ec2.model.{
+  DescribeInstancesRequest, Filter,
+}
 import social.midas.config.aws
 import social.midas.wrapper.aws.generic.AwsClient
 
@@ -27,12 +28,23 @@ case class Ec2Client(region: Region)
    * Fetches the description of EC2 instances grouped by their
    * reservations.
    * 
-   * @param ids Only fetch EC2 instances having these instance ids.
+   * @param ids only fetch EC2 instances having these instance ids
+   * @param filters will be mapped to
+   *   [[software.amazon.awssdk.services.ec2.model.Filter]]s and
+   *   passed to the query
    */
-  def describeInstancesByReservation(ids: Seq[Ec2InstanceId] = Seq())
+  def describeInstancesByReservation(
+    ids: Seq[Ec2InstanceId] = Seq(),
+    filters: Map[String,Seq[String]] = Map(),
+  )
       : IO[Seq[Ec2Reservation]] = {
+    val awsFilters = filters.toIterator.map({case (name, vals) =>
+      Filter.builder().name(name).values(vals: _*).build()
+    }).toSeq
+
     val request = DescribeInstancesRequest.builder()
       .instanceIds(ids.map(_.unwrap).asJava)
+      .filters(awsFilters: _*)
       .build()
     onClient(_.describeInstances(request)).map(
       _.reservations.asScala.toSeq
@@ -45,9 +57,13 @@ case class Ec2Client(region: Region)
    * [[describeInstancesByReservation]] but flattens the result to
    * only contain [[Ec2Instance]]s.
    */
-  def describeInstances(ids: Seq[Ec2InstanceId] = Seq())
+  def describeInstances(
+    ids: Seq[Ec2InstanceId] = Seq(),
+    filters: Map[String,Seq[String]] = Map(),
+  )
       : IO[Seq[Ec2Instance]] =
-    describeInstancesByReservation(ids).map(_.map(_.instances).flatten)
+    describeInstancesByReservation(ids, filters)
+      .map(_.map(_.instances).flatten)
 }
 
 object Ec2Client {

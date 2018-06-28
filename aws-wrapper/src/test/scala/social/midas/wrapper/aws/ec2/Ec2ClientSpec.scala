@@ -38,5 +38,13 @@ class Ec2ClientSpec extends Specification with WithEc2Client {
       selected must have size(1)
       selected.head must_=== existing.head
     }
+
+    "online filter" >> { client: Ec2Client =>
+      val prog = client.describeInstancesByReservation(
+        filters = Map("tag:Name" -> Seq("non-existent"))
+      )
+      val reservations = prog.unsafeRunSync()
+      reservations must be empty
+    }
   }
 }
