@@ -16,9 +16,6 @@ val minimalSettings: Seq[Def.Setting[_]] = Seq(
   //testOptions in Test += Tests.Argument("-oF"),
   parallelExecution in Test := true,
   autoAPIMappings := true,
-  apiURL := Some(
-    url(s"file:${baseDirectory.value.getAbsolutePath}/target/scala-${Versions.scalaMain}/api")
-  ),
   scalacOptions in Compile ++= Seq(
     "-deprecation",
     "-feature",
@@ -98,6 +95,12 @@ lazy val `discovery-aws` = (project in file("discovery-aws"))
   ).dependsOn(
     `aws-wrapper`,
   )
+
+lazy val `service-discovery` = (project in file("."))
+  .settings(
+    minimalSettings,
+  ).enablePlugins(ScalaUnidocPlugin)
+  .aggregate(`aws-wrapper`, `discovery-aws`)
 
 lazy val catsEffect     = "org.typelevel"            %% "cats-effect"      % "0.10.1"
 lazy val circeCore      = "io.circe"                 %% "circe-core"       % "0.9.3"

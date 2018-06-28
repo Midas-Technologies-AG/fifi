@@ -20,7 +20,7 @@ pipeline {
     }
     stage('Generate API documentation') {
       steps {
-        sh "${sbt} doc"
+        sh "${sbt} unidoc"
       }
     }
     stage('Generate JAR') {
@@ -47,18 +47,9 @@ pipeline {
         allowMissing: false,
         alwaysLinkToLastBuild: false,
         keepAll: false,
-        reportDir: "discovery-aws/target/scala-${scalaVersion}/api",
+        reportDir: "target/scala-${scalaVersion}/unidoc",
         reportFiles: 'index.html',
-        reportName: 'ScalaDoc discovery-aws',
-        reportTitles: ''
-      ])
-      publishHTML([
-        allowMissing: false,
-        alwaysLinkToLastBuild: false,
-        keepAll: false,
-        reportDir: "aws-wrapper/target/scala-${scalaVersion}/api",
-        reportFiles: 'index.html',
-        reportName: 'ScalaDoc aws-wrapper',
+        reportName: 'ScalaDoc',
         reportTitles: ''
       ])
     }
