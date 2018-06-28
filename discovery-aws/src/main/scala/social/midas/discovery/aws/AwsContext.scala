@@ -63,7 +63,7 @@ class Extractor[A] extends QueryReducer[ExtractContext[A], Any]
 
   def reduceCtx(acc: Acc, ctx: ExtractContext[A]) = {
     val mapInData: Acc = acc.map(f => {
-        case x: ListMap[String, Any] => f(x("data"))
+        case x: ListMap[String, Any] @unchecked => f(x("data"))
       })
     ctx.withExtractor(mapInData)
   }
@@ -94,10 +94,10 @@ class Extractor[A] extends QueryReducer[ExtractContext[A], Any]
     val wrapChildren: Acc = childrenAcc.map(f => {
       field.fieldType match {
         case ObjectType(_, _, _, _, _, _, _) =>
-          { case x: ListMap[String,Any] =>
+          { case x: ListMap[String,Any] @unchecked =>
             f(x(field.name)) }
         case ListType(_) =>
-          { case x: ListMap[String, Vector[Any]] =>
+          { case x: ListMap[String, Vector[Any]] @unchecked =>
             x(field.name).map(f).toSeq.flatten }
         case _ => f
       }
@@ -106,7 +106,7 @@ class Extractor[A] extends QueryReducer[ExtractContext[A], Any]
     val here =
       if (field.tags.contains(Provides("ip4"))) {
         val extract: Any => Seq[A] = {
-          case x: ListMap[String,A] => Seq(x(field.name))
+          case x: ListMap[String,A] @unchecked => Seq(x(field.name))
         }
         Some(extract)
       } else {
