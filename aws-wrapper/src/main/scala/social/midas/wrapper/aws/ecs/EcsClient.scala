@@ -23,11 +23,19 @@ import software.amazon.awssdk.services.ecs.model.{
 import social.midas.wrapper.aws.generic.{ Arn, ArnLike }
 import social.midas.wrapper.aws.generic.AwsClient
 
+/**
+ * A wrapper for
+ * [[software.amazon.awssdk.services.ecs.ECSAsyncClient]].
+ */
 case class EcsClient(region: Region)
     extends AwsClient[ECSAsyncClientBuilder, ECSAsyncClient] {
 
   def builder = ECSAsyncClient.builder()
 
+  /**
+   * List cluster ARNs and filter the result by `filterArn` if
+   * provided. Note that filtering happens post-fetch.
+   */
   def listClusters(filterArn: Option[Regex] = None)
       : IO[Seq[EcsClusterArn]] =
     queryListExtractTransformMatch[ListClustersResponse, EcsClusterArn](
@@ -37,8 +45,15 @@ case class EcsClient(region: Region)
       filterArn
     )
 
-  def listContainerInstances(cluster: EcsClusterArn, filterArn: Option[Regex] = None)
-      : IO[Seq[EcsContainerInstanceArn]] = {
+  /**
+   * List ARNs of container instances related to `cluster` and filter
+   * the result by `filterArn`. Note that filtering happens
+   * post-fetch.
+   */
+  def listContainerInstances(
+    cluster: EcsClusterArn,
+    filterArn: Option[Regex] = None,
+  ) : IO[Seq[EcsContainerInstanceArn]] = {
     val request = ListContainerInstancesRequest.builder()
       .cluster(cluster.arn.unwrap)
       .build()
@@ -50,8 +65,14 @@ case class EcsClient(region: Region)
     )
   }
 
-  def listServices(cluster: EcsClusterArn, filterArn: Option[Regex] = None)
-      : IO[Seq[EcsServiceArn]] = {
+  /**
+   * List service ARNs related to `cluster` and filter the result by
+   * `filterArn`. Note that filtering happens post-fetch.
+   */
+  def listServices(
+    cluster: EcsClusterArn,
+    filterArn: Option[Regex] = None,
+  ) : IO[Seq[EcsServiceArn]] = {
     val request = ListServicesRequest.builder().cluster(cluster.arn.unwrap).build()
     queryListExtractTransformMatch[ListServicesResponse, EcsServiceArn](
       _.listServices(request),
@@ -61,6 +82,11 @@ case class EcsClient(region: Region)
     )
   }
 
+  /**
+   * List task ARNs related to `cluster` and filter the result by
+   * `filterArn`. Filtering happens post-fetch. Only fetches tasks in
+   * `family` if provided.
+   */
   def listTasks(
     cluster: EcsClusterArn,
     filterArn: Option[Regex] = None,
@@ -79,6 +105,9 @@ case class EcsClient(region: Region)
     )
   }
 
+  /**
+   * Fetches descriptions of `tasks` in `cluster`.
+   */
   def describeTasks(cluster: EcsClusterArn, tasks: Seq[Arn])
       : IO[Seq[EcsTask]] = {
     val request = DescribeTasksRequest.builder()
@@ -90,18 +119,30 @@ case class EcsClient(region: Region)
     )
   }
 
-  def describeContainerInstances(cluster: EcsClusterArn, instances: Seq[Arn]):
-      IO[Seq[EcsContainerInstance]] = {
+  /**
+   * Fetches descriptions of container `instances` on `cluster`.
+   */
+  def describeContainerInstances(
+    cluster: EcsClusterArn,
+    instances: Seq[Arn],
+  ): IO[Seq[EcsContainerInstance]] = {
     val request = DescribeContainerInstancesRequest.builder()
       .cluster(cluster.arn.unwrap)
       .containerInstances(instances.map(_.arn.unwrap).asJava)
       .build()
     onClient(_.describeContainerInstances(request)).map(
-      _.containerInstances.asScala.toSeq.map(EcsContainerInstance(cluster, _))
+      _.containerInstances.asScala.toSeq.map(
+        EcsContainerInstance(cluster, _)
+      )
     )
   }
 
-  def queryListExtractTransformMatch[R,T <: ArnLike](
+  /**
+   * Common logic needed in other functions: fetch a list of elements
+   * via `list`, `extract` the results and transform them to type `T`
+   * which is [[ArnLike]]. Filter these by `maybeRegex` if provided.
+   */
+  protected def queryListExtractTransformMatch[R,T <: ArnLike](
     list: ECSAsyncClient => CompletableFuture[R],
     extract: R => java.util.List[String],
     transform: String => T,
@@ -117,4 +158,3 @@ case class EcsClient(region: Region)
     })
   }
 }
-

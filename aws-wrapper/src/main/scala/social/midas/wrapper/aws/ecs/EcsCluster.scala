@@ -23,21 +23,27 @@ import social.midas.wrapper.aws.generic.{ Arn, ArnLike }
  * res0: io.circe.Decoder.Result[EcsClusterArn] = Right(EcsClusterArn(Arn(foo)))
  * }}}
  */
-case class EcsClusterArn(arn: Arn) extends ArnLike
+final case class EcsClusterArn(arn: Arn) extends ArnLike
 
 object EcsClusterArn {
   def apply(arn: String): EcsClusterArn = EcsClusterArn(Arn(arn))
 
-  implicit val enc: Encoder[EcsClusterArn] = new Encoder[EcsClusterArn] {
-    final def apply(x: EcsClusterArn): Json = Json.fromString(x.arn.unwrap)
-  }
+  /** JSON decoder. */
   implicit val dec: Decoder[EcsClusterArn] = new Decoder[EcsClusterArn] {
     final def apply(c: HCursor): Decoder.Result[EcsClusterArn] =
       c.as[String].map(x => EcsClusterArn(Arn(x)))
   }
+
+  /** JSON encoder. */
+  implicit val enc: Encoder[EcsClusterArn] = new Encoder[EcsClusterArn] {
+    final def apply(x: EcsClusterArn): Json = Json.fromString(x.arn.unwrap)
+  }
 }
 
-case class EcsCluster(
+/**
+ * Product object for ECS clusters and related information.
+ */
+final case class EcsCluster(
   arn: EcsClusterArn,
   containerInstances: Option[Seq[EcsContainerInstanceArn]] = None,
   services: Option[Seq[EcsServiceArn]] = None,
@@ -45,6 +51,9 @@ case class EcsCluster(
 )
 
 object EcsCluster {
+  /** JSON encoder. */
   implicit val dec: Decoder[EcsCluster] = deriveDecoder[EcsCluster]
+
+  /** JSON decoder. */
   implicit val enc: Encoder[EcsCluster] = deriveEncoder[EcsCluster]
 }

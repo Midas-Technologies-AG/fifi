@@ -19,14 +19,19 @@ case class EcsContainerInstanceArn(
 ) extends ArnLike
 
 object EcsContainerInstanceArn {
+
+  /** JSON decoder. */
   implicit val dec: Decoder[EcsContainerInstanceArn] =
     deriveDecoder[EcsContainerInstanceArn]
 
+  /** JSON encoder. */
   implicit val enc: Encoder[EcsContainerInstanceArn] =
     deriveEncoder[EcsContainerInstanceArn]
 
-  def apply(arn: String, clusterArn: String)
-      : EcsContainerInstanceArn =
+  /**
+   * Wrap the supplied strings before construction.
+   */
+  def apply(arn: String, clusterArn: String): EcsContainerInstanceArn =
     EcsContainerInstanceArn(Arn(arn), EcsClusterArn(clusterArn))
 }
 
