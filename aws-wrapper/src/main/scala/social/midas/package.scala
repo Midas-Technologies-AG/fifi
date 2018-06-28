@@ -11,5 +11,5 @@ package object midas {
    * A loaded `ConfigFactory` object. Use this object to load all
    * configuration settings.
    */
-  lazy val config = ConfigFactory.load()
+  lazy val Config = ConfigFactory.load()
 }

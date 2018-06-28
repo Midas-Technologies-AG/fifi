@@ -11,7 +11,7 @@ import software.amazon.awssdk.services.ec2.{
 }
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesRequest
 
-import social.midas.wrapper.aws
+import social.midas.config.aws
 import social.midas.wrapper.aws.generic.AwsClient
 
 /**

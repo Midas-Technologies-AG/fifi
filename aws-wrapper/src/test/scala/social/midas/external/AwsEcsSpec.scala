@@ -6,7 +6,6 @@ package social.midas.external
 import java.net.UnknownHostException
 import java.util.concurrent.ExecutionException
 import software.amazon.awssdk.core.exception.SdkClientException
-import software.amazon.awssdk.regions.Region.EU_CENTRAL_1
 import software.amazon.awssdk.services.ecs.ECSAsyncClient
 import software.amazon.awssdk.services.ecs.model.{
   ListContainerInstancesRequest, ListServicesRequest,
@@ -15,13 +14,15 @@ import org.specs2.execute.{ AsResult, Error, Failure, Result, Skipped }
 import org.specs2.mutable.Specification
 import org.specs2.specification.ForEach
 
+import social.midas.config.aws
+
 /**
  * Getting to know how AWS SDK works.
  */
 class AwsEcsSpec extends Specification with ForEach[ECSAsyncClient] {
 
   def foreach[R: AsResult](f: ECSAsyncClient => R): Result = {
-    val client = ECSAsyncClient.builder().region(EU_CENTRAL_1).build()
+    val client = ECSAsyncClient.builder().region(aws.region).build()
     lazy val networkDown = Skipped("Check your network connection!")
     try {
       AsResult(f(client)) match {
