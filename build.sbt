@@ -55,7 +55,6 @@ val minimalSettings: Seq[Def.Setting[_]] = Seq(
       } yield jarFile
       ).headOption
     }
-    val awsApi = url("http://aws-java-sdk-javadoc.s3-website-us-west-2.amazonaws.com/latest/")
     val links = Seq(
       findManagedDependency("org.scalacheck", "scalacheck")
         .map(_ -> url(Seq(
@@ -66,8 +65,9 @@ val minimalSettings: Seq[Def.Setting[_]] = Seq(
         .map(_ -> url("https://typelevel.org/cats-effect/api/")),
       findManagedDependency("com.typesafe", "config")
         .map(_ -> url("https://lightbend.github.io/config/latest/api/")),
-      findManagedDependency("software.amazon.awssdk", "core").map(_ -> awsApi),
-      findManagedDependency("software.amazon.awssdk", "regions").map(_ -> awsApi),
+    ) ++ Seq("core", "ec2", "regions").map(mod =>
+      findManagedDependency("software.amazon.awssdk", mod)
+        .map(_ -> url("http://aws-java-sdk-javadoc.s3-website-us-west-2.amazonaws.com/latest/"))
     )
     links.collect({ case Some(d) => d }).toMap
   }
