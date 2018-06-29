@@ -9,6 +9,8 @@ import org.specs2.mutable.Specification
 import org.specs2.specification.ForEach
 import software.amazon.awssdk.regions.Region
 
+import social.midas.wrapper.aws.generic.Filter
+
 trait WithEc2Client extends ForEach[Ec2Client] {
   def foreach[R: AsResult](f: Ec2Client => R): Result = {
     val client = Ec2Client(Region.EU_CENTRAL_1)
@@ -41,7 +43,7 @@ class Ec2ClientSpec extends Specification with WithEc2Client {
 
     "online filter" >> { client: Ec2Client =>
       val prog = client.describeInstancesByReservation(
-        filters = Map("tag:Name" -> Seq("non-existent"))
+        filters = Seq(Filter("tag:Name", Seq("non-existent")))
       )
       val reservations = prog.unsafeRunSync()
       reservations must be empty

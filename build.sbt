@@ -11,7 +11,7 @@ lazy val Versions = new {
 val minimalSettings: Seq[Def.Setting[_]] = Seq(
   organization := "social.midas",
   scalaVersion := Versions.scala,
-  version := "0.1.0",
+  version := "0.2.0",
   // Enable full stack-traces when running tests:
   //testOptions in Test += Tests.Argument("-oF"),
   parallelExecution in Test := true,

@@ -9,11 +9,10 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.ec2.{
   EC2AsyncClient, EC2AsyncClientBuilder,
 }
-import software.amazon.awssdk.services.ec2.model.{
-  DescribeInstancesRequest, Filter,
-}
+import software.amazon.awssdk.services.ec2.model.DescribeInstancesRequest
+
 import social.midas.config.aws
-import social.midas.wrapper.aws.generic.AwsClient
+import social.midas.wrapper.aws.generic.{ AwsClient, Filter }
 
 /**
  * A wrapper for
@@ -35,16 +34,11 @@ case class Ec2Client(region: Region)
    */
   def describeInstancesByReservation(
     ids: Seq[Ec2InstanceId] = Seq(),
-    filters: Map[String,Seq[String]] = Map(),
-  )
-      : IO[Seq[Ec2Reservation]] = {
-    val awsFilters = filters.toIterator.map({case (name, vals) =>
-      Filter.builder().name(name).values(vals: _*).build()
-    }).toSeq
-
+    filters: Seq[Filter] = Seq(),
+  ): IO[Seq[Ec2Reservation]] = {
     val request = DescribeInstancesRequest.builder()
       .instanceIds(ids.map(_.unwrap).asJava)
-      .filters(awsFilters: _*)
+      .filters(filters.map(_.toAws): _*)
       .build()
     onClient(_.describeInstances(request)).map(
       _.reservations.asScala.toSeq
@@ -59,7 +53,7 @@ case class Ec2Client(region: Region)
    */
   def describeInstances(
     ids: Seq[Ec2InstanceId] = Seq(),
-    filters: Map[String,Seq[String]] = Map(),
+    filters: Seq[Filter] = Seq(),
   )
       : IO[Seq[Ec2Instance]] =
     describeInstancesByReservation(ids, filters)

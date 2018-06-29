@@ -240,14 +240,37 @@ query Ec2Instances {
   }
 }
 """
-      val fut = Executor.execute(AwsSchema.schema, query, ctx)
-      val doc: Json = Await.result(fut, 10.seconds)
+      val doc: Json = Await.result(
+        Executor.execute(AwsSchema.schema, query, ctx),
+        10.seconds,
+      )
       val parsed = doc.hcursor.downField("data")
         .downField("ec2Instances")
         .as[Seq[Ec2Instance]]
 
       parsed must beRight
       parsed.right.get must not be empty
+    }
+
+    "using filters" >> { ctx: AwsContext =>
+      val query = graphql"""
+query {
+  ec2Instances(
+    filters: [{name: "tag:Name", values: ["non-existent"]}]
+  ) {
+    id
+  }
+} 
+"""
+      val doc: Json = Await.result(
+        Executor.execute(AwsSchema.schema, query, ctx),
+        10.seconds
+      )
+      val extracted = doc.hcursor.downField("data")
+        .downField("ec2Instances")
+        .as[Seq[Ec2Instance]]
+      extracted must beRight
+      extracted.right.get must be empty
     }
   }
 }

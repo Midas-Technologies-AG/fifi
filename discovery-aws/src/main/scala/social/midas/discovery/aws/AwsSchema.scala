@@ -8,8 +8,9 @@ import scala.util.matching.Regex
 import sangria.execution.FieldTag
 import sangria.schema._
 import sangria.macros.derive._
+import sangria.marshalling.circe._
 
-import social.midas.wrapper.aws.generic.Arn
+import social.midas.wrapper.aws.generic.{ Arn, Filter }
 import social.midas.wrapper.aws.ecs._
 import social.midas.wrapper.aws.ec2._
 
@@ -29,6 +30,16 @@ object AwsSchema {
     "filterArn",
     OptionInputType(RegexType),
     description = "Filter ARNs by matching to a regular expression.",
+  )
+
+  implicit val FilterType = deriveInputObjectType[Filter](
+    InputObjectTypeName("Filter"),
+  )
+
+  val FiltersArg = Argument(
+    "filters",
+    OptionInputType(ListInputType(FilterType)),
+    description = "Provide filters on API query.",
   )
 
   implicit val EcsClusterArnType = ScalarAlias[EcsClusterArn, String](
@@ -163,14 +174,21 @@ object AwsSchema {
         arguments = FilterArn :: Nil,
         description = Some("The list of available ECS clusters."),
         resolve = { ctx =>
-          ctx.ctx.clients.ecs.listClusters(ctx.arg(FilterArn)).unsafeToFuture()
+          ctx.ctx.clients.ecs.listClusters(
+            ctx.arg(FilterArn)
+          ).unsafeToFuture()
         },
       ),
       Field(
         "ec2Instances",
         ListType(Ec2InstanceType),
+        arguments = FiltersArg :: Nil,
         description = Some("The list of EC2 instances."),
-        resolve = _.ctx.clients.ec2.describeInstances().unsafeToFuture(),
+        resolve = { ctx =>
+          ctx.ctx.clients.ec2.describeInstances(
+            filters=ctx.arg(FiltersArg).getOrElse(Seq()),
+          ).unsafeToFuture(),
+        },
       ),
     )
   )
