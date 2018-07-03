@@ -13,7 +13,7 @@ import social.midas.wrapper.aws.generic.{ Arn, ArnLike }
 /**
  * The ARN of an ECS container with it's cluster ARN.
  */
-case class EcsTaskArn(
+final case class EcsTaskArn(
   arn: Arn,
   clusterArn: EcsClusterArn,
 ) extends ArnLike
@@ -26,7 +26,7 @@ object EcsTaskArn {
 /**
  * The description of an ECS task.
  */
-case class EcsTask(
+final case class EcsTask(
   arn: Arn,
   clusterArn: EcsClusterArn,
   containerInstance: EcsContainerInstanceArn,

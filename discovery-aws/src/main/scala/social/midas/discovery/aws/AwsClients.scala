@@ -8,7 +8,7 @@ import software.amazon.awssdk.regions.Region
 import social.midas.wrapper.aws.ec2.Ec2Client
 import social.midas.wrapper.aws.ecs.EcsClient
 
-case class AwsClients(region: Region) {
+final case class AwsClients(region: Region) {
   lazy val ec2: Ec2Client = Ec2Client(region)
   lazy val ecs: EcsClient = EcsClient(region)
 

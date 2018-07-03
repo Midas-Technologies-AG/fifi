@@ -18,7 +18,7 @@ import social.midas.wrapper.aws.generic.{ AwsClient, Filter }
  * A wrapper for
  * [[software.amazon.awssdk.services.ec2.EC2AsyncClient]].
  */
-case class Ec2Client(region: Region)
+final case class Ec2Client(region: Region)
     extends AwsClient[EC2AsyncClientBuilder, EC2AsyncClient] {
 
   protected def builder = EC2AsyncClient.builder()
@@ -33,8 +33,8 @@ case class Ec2Client(region: Region)
    *   passed to the query
    */
   def describeInstancesByReservation(
-    ids: Seq[Ec2InstanceId] = Seq(),
-    filters: Seq[Filter] = Seq(),
+    ids: Seq[Ec2InstanceId] = Seq.empty,
+    filters: Seq[Filter] = Seq.empty,
   ): IO[Seq[Ec2Reservation]] = {
     val request = DescribeInstancesRequest.builder()
       .instanceIds(ids.map(_.unwrap).asJava)
@@ -52,8 +52,8 @@ case class Ec2Client(region: Region)
    * only contain [[Ec2Instance]]s.
    */
   def describeInstances(
-    ids: Seq[Ec2InstanceId] = Seq(),
-    filters: Seq[Filter] = Seq(),
+    ids: Seq[Ec2InstanceId] = Seq.empty,
+    filters: Seq[Filter] = Seq.empty,
   )
       : IO[Seq[Ec2Instance]] =
     describeInstancesByReservation(ids, filters)

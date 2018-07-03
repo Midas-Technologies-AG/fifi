@@ -1,3 +1,5 @@
-addSbtPlugin("com.eed3si9n"        % "sbt-unidoc"    % "0.4.1")
-addSbtPlugin("com.github.tkawachi" % "sbt-doctest"   % "0.8.0")
-addSbtPlugin("org.scoverage"       % "sbt-scoverage" % "1.5.1")
+addSbtPlugin("com.eed3si9n"           %  "sbt-unidoc"         % "0.4.1")
+addSbtPlugin("com.frugalmechanic"     %  "fm-sbt-s3-resolver" % "0.14.0")
+addSbtPlugin("com.github.tkawachi"    %  "sbt-doctest"        % "0.8.0")
+addSbtPlugin("org.scoverage"          %  "sbt-scoverage"      % "1.5.1")
+addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat"      % "1.0.7")

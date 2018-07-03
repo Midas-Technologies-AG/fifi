@@ -7,7 +7,7 @@ import io.circe.{ Decoder, Encoder }
 import io.circe.generic.semiauto.{ deriveDecoder, deriveEncoder }
 import software.amazon.awssdk.services.ecs.model.NetworkBinding
 
-case class EcsNetworkBinding(
+final case class EcsNetworkBinding(
   protocol: String, // TODO: Change to enume
   bindIp: String,
   containerPort: Int,

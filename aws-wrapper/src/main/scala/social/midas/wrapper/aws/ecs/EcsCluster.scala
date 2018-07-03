@@ -30,13 +30,13 @@ object EcsClusterArn {
 
   /** JSON decoder. */
   implicit val dec: Decoder[EcsClusterArn] = new Decoder[EcsClusterArn] {
-    final def apply(c: HCursor): Decoder.Result[EcsClusterArn] =
+    def apply(c: HCursor): Decoder.Result[EcsClusterArn] =
       c.as[String].map(x => EcsClusterArn(Arn(x)))
   }
 
   /** JSON encoder. */
   implicit val enc: Encoder[EcsClusterArn] = new Encoder[EcsClusterArn] {
-    final def apply(x: EcsClusterArn): Json = Json.fromString(x.arn.unwrap)
+    def apply(x: EcsClusterArn): Json = Json.fromString(x.arn.unwrap)
   }
 }
 

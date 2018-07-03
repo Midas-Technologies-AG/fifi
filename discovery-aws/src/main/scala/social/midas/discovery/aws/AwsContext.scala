@@ -12,7 +12,7 @@ import sangria.schema.{
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-case class AwsContext(
+final case class AwsContext(
   clients: AwsClients,
   extractor: Option[Any => Seq[String]] = None,
 ) extends ExtractContext[String] {

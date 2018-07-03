@@ -14,7 +14,7 @@ import social.midas.wrapper.aws.generic.{ Arn, Filter }
 import social.midas.wrapper.aws.ecs._
 import social.midas.wrapper.aws.ec2._
 
-case class Provides(data: String) extends FieldTag
+final case class Provides(data: String) extends FieldTag
 
 object AwsSchema {
 
@@ -186,7 +186,7 @@ object AwsSchema {
         description = Some("The list of EC2 instances."),
         resolve = { ctx =>
           ctx.ctx.clients.ec2.describeInstances(
-            filters=ctx.arg(FiltersArg).getOrElse(Seq()),
+            filters=ctx.arg(FiltersArg).getOrElse(Seq.empty),
           ).unsafeToFuture(),
         },
       ),

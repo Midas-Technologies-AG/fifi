@@ -33,7 +33,7 @@ object Ec2ReservationId {
    */
   implicit val enc: Encoder[Ec2ReservationId] =
     new Encoder[Ec2ReservationId] {
-      final def apply(x: Ec2ReservationId): Json =
+      def apply(x: Ec2ReservationId): Json =
         Json.fromString(x.unwrap)
     }
 
@@ -42,7 +42,7 @@ object Ec2ReservationId {
    */
   implicit val dec: Decoder[Ec2ReservationId] =
     new Decoder[Ec2ReservationId] {
-      final def apply(c: HCursor): Decoder.Result[Ec2ReservationId] =
+      def apply(c: HCursor): Decoder.Result[Ec2ReservationId] =
         c.as[String].map(Ec2ReservationId(_))
     }
 }

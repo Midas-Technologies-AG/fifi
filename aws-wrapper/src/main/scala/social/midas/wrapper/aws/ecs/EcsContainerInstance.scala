@@ -13,7 +13,7 @@ import social.midas.wrapper.aws.ec2.Ec2InstanceId
 /**
  * The ARN of an ECS container with it's cluster ARN.
  */
-case class EcsContainerInstanceArn(
+final case class EcsContainerInstanceArn(
   arn: Arn,
   clusterArn: EcsClusterArn,
 ) extends ArnLike
@@ -35,7 +35,7 @@ object EcsContainerInstanceArn {
     EcsContainerInstanceArn(Arn(arn), EcsClusterArn(clusterArn))
 }
 
-case class EcsContainerInstance(
+final case class EcsContainerInstance(
   arn: Arn,
   clusterArn: EcsClusterArn,
   ec2Instance: Ec2InstanceId,

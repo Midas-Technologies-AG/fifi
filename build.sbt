@@ -9,6 +9,7 @@ lazy val Versions = new {
 }
 
 val minimalSettings: Seq[Def.Setting[_]] = Seq(
+  scapegoatVersion in ThisBuild := "1.3.5",
   publishMavenStyle := true,
   publishTo := {
     if (isSnapshot.value)

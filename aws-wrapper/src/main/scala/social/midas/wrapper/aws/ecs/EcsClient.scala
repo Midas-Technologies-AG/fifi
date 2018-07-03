@@ -27,7 +27,7 @@ import social.midas.wrapper.aws.generic.AwsClient
  * A wrapper for
  * [[software.amazon.awssdk.services.ecs.ECSAsyncClient]].
  */
-case class EcsClient(region: Region)
+final case class EcsClient(region: Region)
     extends AwsClient[ECSAsyncClientBuilder, ECSAsyncClient] {
 
   def builder = ECSAsyncClient.builder()

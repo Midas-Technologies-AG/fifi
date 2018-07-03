@@ -11,7 +11,7 @@ import social.midas.wrapper.aws.generic.{ Arn, ArnLike }
 /**
  * The ARN of an ECS container with it's cluster ARN.
  */
-case class EcsServiceArn(
+final case class EcsServiceArn(
   arn: Arn,
   clusterArn: EcsClusterArn,
 ) extends ArnLike

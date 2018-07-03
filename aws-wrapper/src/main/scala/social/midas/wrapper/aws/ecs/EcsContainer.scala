@@ -13,7 +13,7 @@ import social.midas.wrapper.aws.generic.{ Arn, ArnLike }
 /**
  * The ARN of an ECS container with it's cluster ARN.
  */
-case class EcsContainerArn(
+final case class EcsContainerArn(
   arn: Arn,
   clusterArn: EcsClusterArn,
 ) extends ArnLike
@@ -24,7 +24,7 @@ object EcsContainerArn {
     
 }
 
-case class EcsContainer(
+final case class EcsContainer(
   arn: Arn,
   clusterArn: EcsClusterArn,
   networkBindings: Seq[EcsNetworkBinding],

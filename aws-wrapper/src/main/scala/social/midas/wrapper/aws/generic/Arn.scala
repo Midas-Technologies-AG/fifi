@@ -42,16 +42,16 @@ trait ArnLike {
  * res0: io.circe.Decoder.Result[Arn] = Right(Arn(foo))
  * }}}
  */
-sealed case class Arn(unwrap: String) extends ArnLike {
+final case class Arn(unwrap: String) extends ArnLike {
   def arn = this
 }
 
 object Arn {
   implicit val enc: Encoder[Arn] = new Encoder[Arn] {
-    final def apply(x: Arn): Json = Json.fromString(x.unwrap)
+    def apply(x: Arn): Json = Json.fromString(x.unwrap)
   }
   implicit val dec: Decoder[Arn] = new Decoder[Arn] {
-    final def apply(c: HCursor): Decoder.Result[Arn] =
+    def apply(c: HCursor): Decoder.Result[Arn] =
       c.as[String].map(Arn(_))
   }
 }
