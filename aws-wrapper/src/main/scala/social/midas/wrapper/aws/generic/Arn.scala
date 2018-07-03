@@ -43,7 +43,7 @@ trait ArnLike {
  * }}}
  */
 final case class Arn(unwrap: String) extends ArnLike {
-  def arn = this
+  def arn: Arn = this
 }
 
 object Arn {
