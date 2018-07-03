@@ -9,6 +9,13 @@ lazy val Versions = new {
 }
 
 val minimalSettings: Seq[Def.Setting[_]] = Seq(
+  publishMavenStyle := true,
+  publishTo := {
+    if (isSnapshot.value)
+      Some("snapshots" at "s3://maven-snapshots.midas.social/")
+    else
+      Some("releases"  at "s3://maven-releases.midas.social/")
+  },
   organization := "social.midas",
   scalaVersion := Versions.scala,
   version := "0.2.0",
