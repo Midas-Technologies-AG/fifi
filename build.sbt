@@ -45,6 +45,8 @@ val minimalSettings: Seq[Def.Setting[_]] = Seq(
     log4jApiScala,
     circeLiteral     % Test,
     circeParser      % Test,
+    junitInterface   % Test,
+    scalaJava8Compat % Test,
     scalacheck       % Test,
     specs2Core       % Test,
     specs2Junit      % Test,
@@ -153,7 +155,9 @@ lazy val sangria          = "org.sangria-graphql"      %% "sangria"          % "
 lazy val sangriaCirce     = "org.sangria-graphql"      %% "sangria-circe"    % "1.2.1"
 
 // Testing libraries:
-lazy val scalacheck       = "org.scalacheck" %% "scalacheck"        % "1.14.0"
-lazy val specs2Core       = "org.specs2"     %% "specs2-core"       % "4.2.0"
-lazy val specs2Junit      = "org.specs2"     %% "specs2-junit"      % specs2Core.revision
-lazy val specs2Scalacheck = "org.specs2"     %% "specs2-scalacheck" % specs2Core.revision
+lazy val junitInterface   = "com.novocode"           %  "junit-interface"    % "0.11"
+lazy val scalaJava8Compat = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0"
+lazy val scalacheck       = "org.scalacheck"         %% "scalacheck"         % "1.14.0"
+lazy val specs2Core       = "org.specs2"             %% "specs2-core"        % "4.2.0"
+lazy val specs2Junit      = "org.specs2"             %% "specs2-junit"       % specs2Core.revision
+lazy val specs2Scalacheck = "org.specs2"             %% "specs2-scalacheck"  % specs2Core.revision
