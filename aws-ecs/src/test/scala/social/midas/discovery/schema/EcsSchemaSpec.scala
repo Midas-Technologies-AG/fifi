@@ -126,9 +126,7 @@ query ContainerQuery {
   }
 }
       """
-      val fut =
-        common.executeQuery(query)
-
+      val fut = common.executeQuery(query)
       val doc: Json = Await.result(fut, 10.second)
       val cursor = doc.hcursor
       val parsed = cursor.downField("data")
@@ -170,38 +168,12 @@ query {
       parsed must beRight
       parsed.right.get must be matching Ip4Regex
     }
-    /**
-  }
 
-  "container instances" >> {
-    "get from ecsClusters" >> { ctx: AwsContext =>
+    "resolve instances ip address" >> {
       val query = graphql"""
 query ContainerQuery {
   ecsClusters {
-    arn
     containerInstances {
-      arn
-      clusterArn
-    }
-  }
-}
-      """
-      val result = extractClustersFromFutureJson[Seq[EcsCluster]](
-        Executor.execute(AwsSchema.schema, query, ctx)
-      )
-      
-      result must beRight
-      result.right.get.head.containerInstances must beSome
-      result.right.get.head.containerInstances.get must not be empty
-    }
-
-    "resolve instances ip address" >> { ctx: AwsContext =>
-      val query = graphql"""
-query ContainerQuery {
-  ecsClusters {
-    arn
-    containerInstances {
-      arn
       ec2Instance {
         privateIpAddress
       }
@@ -209,9 +181,7 @@ query ContainerQuery {
   }
 }
 """
-      val fut =
-        Executor.execute(AwsSchema.schema, query, ctx, deferredResolver=Fetchers.resolver)
-
+      val fut = common.executeQuery(query)
       val doc: Json = Await.result(fut, 10.second)
       val cursor = doc.hcursor
       val parsed = cursor.downField("data")
@@ -224,6 +194,5 @@ query ContainerQuery {
       parsed must beRight
       parsed.right.get must be matching Ip4Regex
     }
-     */
   }
 }
