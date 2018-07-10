@@ -19,7 +19,7 @@ val minimalSettings: Seq[Def.Setting[_]] = Seq(
   },
   organization := "social.midas",
   scalaVersion := Versions.scala,
-  version := "0.3.0",
+  version := "0.3.1",
   // Enable full stack-traces when running tests:
   //testOptions in Test += Tests.Argument("-oF"),
   parallelExecution in Test := true,
@@ -126,11 +126,13 @@ lazy val `discovery-aws-ecs` = (project in file("aws-ecs"))
     `discovery-aws-ec2`,
   )
 
-lazy val `discovery-aws` = (project in file("."))
+lazy val `root` = (project in file("."))
   .settings(
     minimalSettings,
   ).enablePlugins(ScalaUnidocPlugin)
   .aggregate(
+    `discovery-common`,
+    `discovery-common-aws`,
     `discovery-aws-ec2`,
     `discovery-aws-ecs`,
   )

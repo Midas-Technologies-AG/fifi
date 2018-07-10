@@ -3,6 +3,7 @@
  */
 package social.midas.discovery
 
+import org.apache.logging.log4j.scala.Logging
 import sangria.ast.Document
 import sangria.execution.{ Executor, ExecutionScheme }
 import sangria.execution.deferred.HasId
@@ -12,7 +13,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 import scala.collection.JavaConverters._
 import scala.util.Success
 
-package object common {
+package object common extends Logging {
 
   val defaultContext = DefaultContext(None)
 
@@ -51,32 +52,41 @@ package object common {
     extractors: List[Extractor] = List.empty,
   )(implicit ec: ExecutionContext
   ) = {
+    logger.traceEntry(query, ctx, extractors)
     val (root, resolver) = SchemaFinder(ctx).findRootAndResolver()
-    Executor.prepare(
-      root, query, ctx,
-      deferredResolver=resolver,
-      queryReducers=extractors,
+    logger.traceExit(
+      Executor.prepare(
+        root, query, ctx,
+        deferredResolver=resolver,
+        queryReducers=extractors,
+      )
     )
   }
 
   def discoverFromConfig[T]()(implicit ec: ExecutionContext)
       : Future[Seq[T]] = {
+    logger.traceEntry()
     val queryConf = defaultContext.conf.getString("discovery.query")
+    logger.debug(s"Got query from configuration: ${queryConf}")
     val Success(query: Document) = QueryParser.parse(queryConf)
+    logger.debug(s"Parsed query: ${query}")
     val extractorsConf = defaultContext.conf
       .getStringList("discovery.extractors").asScala.toList
+    logger.debug(s"Got extractors from configuration: ${extractorsConf}")
     val extractors = extractorsConf.map(getObject[Extractor](_))
+    logger.debug(s"Resolved to extractors: ${extractors}")
     val prepared = prepareQuery(query, defaultContext, extractors)
     val result = prepared.flatMap(_.execute())
-    if (extractorsConf == List.empty) {
-      result.map(_.asInstanceOf[Seq[T]])
-    } else {
-      prepared.flatMap(p => {
-        val extractor = p.userContext.extractor.get
-        result.map(r => extractor(r).asInstanceOf[Seq[T]])
-      })
-    }
-
+    logger.traceExit(
+      if (extractorsConf == List.empty) {
+        result.map(_.asInstanceOf[Seq[T]])
+      } else {
+        prepared.flatMap(p => {
+          val extractor = p.userContext.extractor.get
+          result.map(r => extractor(r).asInstanceOf[Seq[T]])
+        })
+      }
+    )
   }
 
   /**
@@ -86,10 +96,11 @@ package object common {
    * denote an object. We do not try to correct wrong spellings here.
    */
   def getObject[T](name: String): T = {
+    logger.traceEntry(name)
     val clazz = Class.forName(name).asInstanceOf[Class[_ <: T]]
     val obj = clazz.getDeclaredField("MODULE$")
-    obj.get(null).asInstanceOf[T]
+    logger.traceExit(
+      obj.get(null).asInstanceOf[T]
+    )
   }
-
-
 }

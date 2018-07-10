@@ -3,6 +3,7 @@
  */
 package social.midas.discovery.common
 
+import org.apache.logging.log4j.scala.Logging
 import sangria.ast.{ Argument => AstArgument, Field => AstField }
 import sangria.execution.{ ExecutionPath, QueryReducer }
 import sangria.schema.{
@@ -11,7 +12,9 @@ import sangria.schema.{
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-abstract class Extractor extends QueryReducer[AbstractContext, Any] {
+abstract class Extractor
+    extends QueryReducer[AbstractContext, Any]
+    with Logging {
   type A
   val provides: Provides
 
@@ -62,6 +65,10 @@ abstract class Extractor extends QueryReducer[AbstractContext, Any] {
         (ExecutionPath, List[Argument[_]], Vector[AstArgument])
       => Try[sangria.schema.Args],
   ): Acc = {
+    logger.traceEntry(
+      fieldAcc, childrenAcc, path, ctx, astFields,
+      parentType, field, argumentValuesFn,
+    )
     val wrapChildren: Acc = childrenAcc.map(f => {
       field.fieldType match {
         case ObjectType(_, _, _, _, _, _, _) =>
@@ -83,6 +90,6 @@ abstract class Extractor extends QueryReducer[AbstractContext, Any] {
       } else {
         initial
       }
-    sequenceFs(f, here)
+    logger.traceExit(sequenceFs(f, here))
   }
 }
