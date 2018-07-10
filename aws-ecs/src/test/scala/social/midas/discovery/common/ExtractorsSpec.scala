@@ -73,6 +73,6 @@ query {
       val extracted = extractor(result).asInstanceOf[Seq[String]]
       extracted must not be empty
       extracted must contain(matching(Ip4Regex)).foreach
-   }
+    }
   }
 }
