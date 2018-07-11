@@ -18,6 +18,22 @@ val minimalSettings: Seq[Def.Setting[_]] = Seq(
       Some("releases"  at "s3://maven-releases.midas.social/")
   },
   organization := "social.midas",
+  organizationName := "Midas Technologies AG",
+  organizationHomepage := Some(url("https://midas.social/")),
+  developers := List(Developer(
+    email = "hacking@babibo.de",
+    id = "thomas",
+    name = "Thomas Bach",
+    url = url("https://github.com/fuzzy-id"),
+  )),
+  licenses := Seq(
+    "Apache License, ASL Version 2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0"),
+  ),
+  scmInfo := Some(ScmInfo(
+    browseUrl = url("https://github.com/Midas-Technologies-AG/service-discovery/tree/master"),
+    connection    = "scm:git:ssh://github.com:Midas-Technologies-AG/service-discovery.git",
+    devConnection = "scm:git:ssh://github.com:Midas-Technologies-AG/service-discovery.git",
+  )),
   scalaVersion := Versions.scala,
   version := "0.3.1",
   // Enable full stack-traces when running tests:
