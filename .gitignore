@@ -3,3 +3,5 @@ target/
 
 # Emacs related:
 *~
+.ensime
+.ensime_cache
