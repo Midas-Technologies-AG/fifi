@@ -15,26 +15,17 @@
  */
 package social.midas.discovery.aws.ecs
 
-import cats.effect.IO
 import java.util.concurrent.CompletableFuture
+
 import scala.collection.JavaConverters._
 import scala.util.matching.Regex
-import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.ecs.{
-  ECSAsyncClient, ECSAsyncClientBuilder
-}
-import software.amazon.awssdk.services.ecs.model.{
-  DescribeContainerInstancesRequest,
-  DescribeTasksRequest,
-  ListClustersResponse,
-  ListContainerInstancesRequest, ListContainerInstancesResponse,
-  ListServicesRequest, ListServicesResponse,
-  ListTasksRequest, ListTasksResponse,
-}
 
-import social.midas.discovery.common.AbstractContext
-import social.midas.discovery.common.aws
-import social.midas.discovery.common.aws.{ Arn, ArnLike, AwsClient }
+import cats.effect.IO
+import social.midas.discovery.common.{AbstractContext, aws}
+import social.midas.discovery.common.aws.{Arn, ArnLike, AwsClient}
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.ecs.{ECSAsyncClient, ECSAsyncClientBuilder}
+import software.amazon.awssdk.services.ecs.model.{DescribeContainerInstancesRequest, DescribeTasksRequest, ListClustersResponse, ListContainerInstancesRequest, ListContainerInstancesResponse, ListServicesRequest, ListServicesResponse, ListTasksRequest, ListTasksResponse}
 
 /**
  * A wrapper for
@@ -153,7 +144,7 @@ final case class EcsClient(region: Region)
   /**
    * Common logic needed in other functions: fetch a list of elements
    * via `list`, `extract` the results and transform them to type `T`
-   * which is [[social.midas.common.aws.ArnLike]]. Filter these by
+   * which is [[social.midas.discovery.common.aws.ArnLike]]. Filter these by
    * `maybeRegex` if provided.
    */
   protected def queryListExtractTransformMatch[R,T <: ArnLike](
