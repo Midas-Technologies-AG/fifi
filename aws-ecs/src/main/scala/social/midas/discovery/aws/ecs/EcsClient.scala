@@ -153,7 +153,8 @@ final case class EcsClient(region: Region)
   /**
    * Common logic needed in other functions: fetch a list of elements
    * via `list`, `extract` the results and transform them to type `T`
-   * which is [[ArnLike]]. Filter these by `maybeRegex` if provided.
+   * which is [[social.midas.common.aws.ArnLike]]. Filter these by
+   * `maybeRegex` if provided.
    */
   protected def queryListExtractTransformMatch[R,T <: ArnLike](
     list: ECSAsyncClient => CompletableFuture[R],
