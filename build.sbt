@@ -39,8 +39,11 @@ val minimalSettings: Seq[Def.Setting[_]] = Seq(
     devConnection = "scm:git:ssh://github.com:Midas-Technologies-AG/service-discovery.git",
   )),
   sonatypeProfileName := "social.midas",
+  releaseProcess ++= Seq(
+    releaseStepCommand("publishSigned"),
+    releaseStepCommand("sonatypeRelease"),
+  ),
   scalaVersion := Versions.scala,
-  version := "0.3.1",
   // Enable full stack-traces when running tests:
   //testOptions in Test += Tests.Argument("-oF"),
   parallelExecution in Test := true,
@@ -150,6 +153,9 @@ lazy val `discovery-aws-ecs` = (project in file("aws-ecs"))
 lazy val `root` = (project in file("."))
   .settings(
     minimalSettings,
+    publishArtifact := false,
+    publish := {},
+    publishLocal := {},
   ).enablePlugins(ScalaUnidocPlugin)
   .aggregate(
     `discovery-common`,
