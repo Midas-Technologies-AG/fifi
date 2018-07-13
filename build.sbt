@@ -43,6 +43,9 @@ val minimalSettings: Seq[Def.Setting[_]] = Seq(
     releaseStepCommand("publishSigned"),
     releaseStepCommand("sonatypeRelease"),
   ),
+  apiURL := Some(
+    url(s"https://oss.sonatype.org/service/local/repositories/releases/archive/social/midas/${name.value}_${Versions.scalaMain}/${version.value}/${name.value}_${Versions.scalaMain}-${version.value}-javadoc.jar/!/")
+  ),
   scalaVersion := Versions.scala,
   // Enable full stack-traces when running tests:
   //testOptions in Test += Tests.Argument("-oF"),
