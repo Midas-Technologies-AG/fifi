@@ -34,9 +34,9 @@ val minimalSettings: Seq[Def.Setting[_]] = Seq(
     "Apache License, ASL Version 2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0"),
   ),
   scmInfo := Some(ScmInfo(
-    browseUrl = url("https://github.com/Midas-Technologies-AG/service-discovery/tree/master"),
-    connection    = "scm:git:ssh://github.com:Midas-Technologies-AG/service-discovery.git",
-    devConnection = "scm:git:ssh://github.com:Midas-Technologies-AG/service-discovery.git",
+    url("https://github.com/Midas-Technologies-AG/service-discovery/tree/master"),
+    "scm:git:ssh://github.com:Midas-Technologies-AG/service-discovery.git",
+    "scm:git:ssh://github.com:Midas-Technologies-AG/service-discovery.git",
   )),
   sonatypeProfileName := "social.midas",
   releaseProcess ++= Seq(
@@ -59,6 +59,8 @@ val minimalSettings: Seq[Def.Setting[_]] = Seq(
   scalacOptions in (Compile, doc) += "-groups",
   scalacOptions in (Compile, console) ~= (_.filterNot (_ == "-Xlint")),
   doctestTestFramework := DoctestTestFramework.Specs2,
+  doctestMarkdownEnabled := true,
+  doctestMarkdownPathFinder := baseDirectory.value * "doc" ** "*.md",
   fork in Test := true,
   testOptions in Test +=
     Tests.Argument(TestFrameworks.Specs2, "junitxml", "console"),
@@ -157,6 +159,12 @@ lazy val `root` = (project in file("."))
     publish := {},
     publishLocal := {},
   ).enablePlugins(ScalaUnidocPlugin)
+  .dependsOn(
+    `discovery-common`,
+    `discovery-common-aws`,
+    `discovery-aws-ec2`,
+    `discovery-aws-ecs`,
+  )
   .aggregate(
     `discovery-common`,
     `discovery-common-aws`,
