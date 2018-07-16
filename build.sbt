@@ -20,7 +20,7 @@ lazy val Versions = new {
 }
 
 val minimalSettings: Seq[Def.Setting[_]] = Seq(
-  scapegoatVersion in ThisBuild := "1.3.5",
+  scapegoatVersion in ThisBuild := "1.3.6",
   publishMavenStyle := true,
   publishTo := sonatypePublishTo.value,
   organization := "social.midas",
