@@ -16,6 +16,7 @@
 addSbtPlugin("com.eed3si9n"           %  "sbt-unidoc"         % "0.4.1")
 addSbtPlugin("com.github.gseitz"      %  "sbt-release"        % "1.0.9")
 addSbtPlugin("com.github.tkawachi"    %  "sbt-doctest"        % "0.8.0")
+addSbtPlugin("com.jsuereth"           %  "sbt-pgp"            % "1.1.1")
 addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat"      % "1.0.7")
 addSbtPlugin("org.scoverage"          %  "sbt-scoverage"      % "1.5.1")
 addSbtPlugin("org.xerial.sbt"         %  "sbt-sonatype"       % "2.3")
