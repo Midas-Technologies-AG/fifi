@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-addSbtPlugin("com.eed3si9n"           %  "sbt-unidoc"         % "0.4.1")
-addSbtPlugin("com.github.gseitz"      %  "sbt-release"        % "1.0.9")
-addSbtPlugin("com.github.tkawachi"    %  "sbt-doctest"        % "0.8.0")
-addSbtPlugin("com.jsuereth"           %  "sbt-pgp"            % "1.1.1")
-addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat"      % "1.0.7")
-addSbtPlugin("org.scoverage"          %  "sbt-scoverage"      % "1.5.1")
-addSbtPlugin("org.xerial.sbt"         %  "sbt-sonatype"       % "2.3")
+addSbtPlugin("com.eed3si9n"           %  "sbt-unidoc"         % "0.4.1") // https://github.com/sbt/sbt-unidoc
+addSbtPlugin("com.github.gseitz"      %  "sbt-release"        % "1.0.9") // https://github.com/sbt/sbt-release
+addSbtPlugin("com.github.tkawachi"    %  "sbt-doctest"        % "0.8.0") // https://github.com/tkawachi/sbt-doctest
+addSbtPlugin("com.jsuereth"           %  "sbt-pgp"            % "1.1.1") // https://www.scala-sbt.org/sbt-pgp/
+addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat"      % "1.0.7") // https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.sksamuel.scapegoat%22%20AND%20a%3A%22sbt-scapegoat%22
+addSbtPlugin("org.scoverage"          %  "sbt-scoverage"      % "1.5.1") // https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.scoverage%22%20AND%20a%3A%22sbt-scoverage%22
+addSbtPlugin("org.xerial.sbt"         %  "sbt-sonatype"       % "2.3")   // https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.xerial.sbt%22%20AND%20a%3A%22sbt-sonatype%22
