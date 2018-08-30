@@ -110,6 +110,11 @@ val minimalSettings: Seq[Def.Setting[_]] = Seq(
   }
 )
 
+lazy val `test-utils` = (project in file("test-utils"))
+  .settings(
+    minimalSettings
+  )
+
 lazy val `discovery-common` = (project in file("common"))
   .settings(
     minimalSettings,
@@ -130,7 +135,9 @@ lazy val `discovery-common-aws` = (project in file("common-aws"))
       newAwsSdkRegions,
       newAwsSdkUtils,
     ),
-  ).dependsOn(`discovery-common`)
+  ).dependsOn(
+    `discovery-common`,
+  )
 
 lazy val `discovery-aws-ec2` = (project in file("aws-ec2"))
   .settings(
@@ -141,7 +148,8 @@ lazy val `discovery-aws-ec2` = (project in file("aws-ec2"))
     ),
   ).dependsOn(
     `discovery-common`,
-    `discovery-common-aws`
+    `discovery-common-aws`,
+    `test-utils` % Test,
   )
 
 lazy val `discovery-aws-ecs` = (project in file("aws-ecs"))
@@ -153,6 +161,7 @@ lazy val `discovery-aws-ecs` = (project in file("aws-ecs"))
     ),
   ).dependsOn(
     `discovery-aws-ec2`,
+    `test-utils` % Test,
   )
 
 lazy val `root` = (project in file("."))
