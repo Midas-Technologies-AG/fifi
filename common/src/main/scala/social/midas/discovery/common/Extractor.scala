@@ -19,7 +19,7 @@ import org.apache.logging.log4j.scala.Logging
 import sangria.ast.{ Argument => AstArgument, Field => AstField }
 import sangria.execution.{ ExecutionPath, QueryReducer }
 import sangria.schema.{
-  Argument, EnumType, Field, ListType, ObjectType, ScalarType,
+  Argument, EnumType, Field, ListType, ObjectType, OptionType, ScalarType,
 }
 import scala.collection.immutable.ListMap
 import scala.util.Try
@@ -48,15 +48,19 @@ abstract class Extractor
     path: ExecutionPath,
     ctx: AbstractContext,
     tpe: EnumType[T],
-  ): Acc =
+  ): Acc = 
     initial
 
   def reduceScalar[T](
     path: ExecutionPath,
     ctx: AbstractContext,
     tpe: ScalarType[T],
-  ): Acc =
-    initial
+  ): Acc = {
+    logger.traceEntry(path, ctx, tpe)
+    logger.traceExit(
+      Some({case x: A @unchecked => Seq(x)})
+    )
+  }
 
   def reduceCtx(acc: Acc, ctx: AbstractContext) = {
     val mapInData: Acc = acc.map(f => {
@@ -84,6 +88,9 @@ abstract class Extractor
     val wrapChildren: Acc = childrenAcc.map(f => {
       field.fieldType match {
         case ObjectType(_, _, _, _, _, _, _) =>
+          { case x: ListMap[String,Any] @unchecked =>
+            f(x(field.name)) }
+        case OptionType(_) =>
           { case x: ListMap[String,Any] @unchecked =>
             f(x(field.name)) }
         case ListType(_) =>
