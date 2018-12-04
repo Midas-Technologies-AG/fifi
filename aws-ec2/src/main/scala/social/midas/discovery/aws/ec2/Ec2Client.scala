@@ -19,7 +19,7 @@ import cats.effect.IO
 import scala.collection.JavaConverters._
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.ec2.{
-  EC2AsyncClient, EC2AsyncClientBuilder,
+  Ec2AsyncClient, Ec2AsyncClientBuilder,
 }
 import software.amazon.awssdk.services.ec2.model.DescribeInstancesRequest
 
@@ -29,12 +29,12 @@ import social.midas.discovery.common.aws.AwsClient
 
 /**
  * A wrapper for
- * [[software.amazon.awssdk.services.ec2.EC2AsyncClient]].
+ * [[software.amazon.awssdk.services.ec2.Ec2AsyncClient]].
  */
 final case class Ec2Client(region: Region)
-    extends AwsClient[EC2AsyncClientBuilder, EC2AsyncClient] {
+    extends AwsClient[Ec2AsyncClientBuilder, Ec2AsyncClient] {
 
-  protected def builder = EC2AsyncClient.builder()
+  protected def builder = Ec2AsyncClient.builder()
 
   /**
    * Fetches the description of EC2 instances grouped by their
@@ -49,10 +49,18 @@ final case class Ec2Client(region: Region)
     ids: Seq[Ec2InstanceId] = Seq.empty,
     filters: Seq[Ec2Filter] = Seq.empty,
   ): IO[Seq[Ec2Reservation]] = {
-    val request = DescribeInstancesRequest.builder()
-      .instanceIds(ids.map(_.unwrap).asJava)
-      .filters(filters.map(_.toAws): _*)
-      .build()
+    val builder = DescribeInstancesRequest.builder()
+    val reqWithIds = if (ids.length > 0) {
+      builder.instanceIds(ids.map(_.unwrap).asJava)
+    } else {
+      builder
+    }
+    val reqWithFilter = if (filters.length > 0) {
+      reqWithIds.filters(filters.map(_.toAws): _*)
+    } else {
+      reqWithIds
+    }
+    val request = reqWithFilter.build()
     withClient(_.describeInstances(request)).map(
       _.reservations.asScala.toSeq
         .map(Ec2Reservation(_))

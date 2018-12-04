@@ -18,10 +18,8 @@ package social.midas.external
 import java.net.UnknownHostException
 import java.util.concurrent.ExecutionException
 import software.amazon.awssdk.core.exception.SdkClientException
-import software.amazon.awssdk.services.ecs.ECSAsyncClient
-import software.amazon.awssdk.services.ecs.model.{
-  ListContainerInstancesRequest, ListServicesRequest,
-}
+import software.amazon.awssdk.services.ecs.EcsAsyncClient
+import software.amazon.awssdk.services.ecs.model.ListServicesRequest
 import org.specs2.execute.{ AsResult, Error, Failure, Result, Skipped }
 import org.specs2.mutable.Specification
 import org.specs2.specification.ForEach
@@ -31,10 +29,10 @@ import social.midas.discovery.common.aws.region
 /**
  * Getting to know how AWS SDK works.
  */
-class AwsEcsSpec extends Specification with ForEach[ECSAsyncClient] {
+class AwsEcsSpec extends Specification with ForEach[EcsAsyncClient] {
 
-  def foreach[R: AsResult](f: ECSAsyncClient => R): Result = {
-    val client = ECSAsyncClient.builder().region(region()).build()
+  def foreach[R: AsResult](f: EcsAsyncClient => R): Result = {
+    val client = EcsAsyncClient.builder().region(region()).build()
     lazy val networkDown = Skipped("Check your network connection!")
     try {
       AsResult(f(client)) match {
@@ -63,13 +61,13 @@ class AwsEcsSpec extends Specification with ForEach[ECSAsyncClient] {
   }
 
   "ClusterNotFoundException on" >> {
-    "`listContainerInstances()`" >> { client: ECSAsyncClient =>
+    "`listContainerInstances()`" >> { client: EcsAsyncClient =>
       client.listContainerInstances().get must throwA[ExecutionException]
         .like({ case exc =>
           exc.getCause.getMessage() must startWith("Cluster not found.")
         })
     }
-    "`listServices()`" >> { client: ECSAsyncClient =>
+    "`listServices()`" >> { client: EcsAsyncClient =>
       client.listServices().get must throwA[ExecutionException]
         .like({ case exc =>
           exc.getCause.getMessage() must startWith("Cluster not found.")
@@ -78,7 +76,7 @@ class AwsEcsSpec extends Specification with ForEach[ECSAsyncClient] {
   }
 
   "listing resources" >> { 
-    "at least one cluster should be present" >> { client: ECSAsyncClient =>
+    "at least one cluster should be present" >> { client: EcsAsyncClient =>
       val response = client.listClusters().get
       response.clusterArns.isEmpty must_== false
     }
@@ -95,7 +93,7 @@ class AwsEcsSpec extends Specification with ForEach[ECSAsyncClient] {
       resp.containerInstanceArns.isEmpty must_== false
     }
 
-    "at least one service should be present" >> { client: ECSAsyncClient =>
+    "at least one service should be present" >> { client: EcsAsyncClient =>
       val clusterList = client.listClusters().get
       val clusterArn = clusterList.clusterArns.get(0)
 

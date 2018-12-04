@@ -24,17 +24,21 @@ import cats.effect.IO
 import social.midas.discovery.common.{AbstractContext, aws}
 import social.midas.discovery.common.aws.{Arn, ArnLike, AwsClient}
 import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.ecs.{ECSAsyncClient, ECSAsyncClientBuilder}
-import software.amazon.awssdk.services.ecs.model.{DescribeContainerInstancesRequest, DescribeTasksRequest, ListClustersResponse, ListContainerInstancesRequest, ListContainerInstancesResponse, ListServicesRequest, ListServicesResponse, ListTasksRequest, ListTasksResponse}
+import software.amazon.awssdk.services.ecs.{EcsAsyncClient, EcsAsyncClientBuilder}
+import software.amazon.awssdk.services.ecs.model.{
+  DescribeContainerInstancesRequest, DescribeTasksRequest, ListClustersResponse,
+  ListContainerInstancesRequest, ListContainerInstancesResponse, ListServicesRequest,
+  ListServicesResponse, ListTasksRequest, ListTasksResponse,
+}
 
 /**
  * A wrapper for
  * [[software.amazon.awssdk.services.ecs.ECSAsyncClient]].
  */
 final case class EcsClient(region: Region)
-    extends AwsClient[ECSAsyncClientBuilder, ECSAsyncClient] {
+    extends AwsClient[EcsAsyncClientBuilder, EcsAsyncClient] {
 
-  def builder = ECSAsyncClient.builder()
+  def builder = EcsAsyncClient.builder()
 
   /**
    * List cluster ARNs and filter the result by `filterArn` if
@@ -148,7 +152,7 @@ final case class EcsClient(region: Region)
    * `maybeRegex` if provided.
    */
   protected def queryListExtractTransformMatch[R,T <: ArnLike](
-    list: ECSAsyncClient => CompletableFuture[R],
+    list: EcsAsyncClient => CompletableFuture[R],
     extract: R => java.util.List[String],
     transform: String => T,
     maybeRegex: Option[Regex] = None,
