@@ -89,10 +89,29 @@ abstract class Extractor
       field.fieldType match {
         case ObjectType(_, _, _, _, _, _, _) =>
           { case x: ListMap[String,Any] @unchecked =>
-            f(x(field.name)) }
+            f(x(field.name))
+            case null => {
+              logger.error("Matched null");
+              logger.error(s"fieldAcc: ${fieldAcc}")
+              logger.error(s"childrenAcc: ${childrenAcc}")
+              logger.error(s"path: ${path}")
+              logger.error(s"ctx: ${ctx}")
+              logger.error(s"astFields: ${astFields}")
+              logger.error(s"parentType: ${parentType}")
+              logger.error(s"field: ${field}")
+              logger.error(s"argumentValuesFn: ${argumentValuesFn}")
+              throw new Exception("Unexpected null")
+            }
+          }
         case OptionType(_) =>
-          { case x: ListMap[String,Any] @unchecked =>
-            f(x(field.name)) }
+          { case x: ListMap[String,Any] @unchecked => {
+            logger.traceEntry(x)
+            val value = Option(x(field.name))
+            if (value == None) {
+              logger.info(s"Could not find value in path: ${path}")
+            }
+            logger.traceExit(value.toSeq.flatMap(f))
+          }}
         case ListType(_) =>
           { case x: ListMap[String, Vector[Any]] @unchecked =>
             x(field.name).map(f).toSeq.flatten }
