@@ -15,12 +15,12 @@
  */
 lazy val Versions = new {
   val scalaMain = "2.12"
-  val scalaSub  = "6"
+  val scalaSub  = "7"
   val scala     = s"${scalaMain}.${scalaSub}"
 }
 
 val minimalSettings: Seq[Def.Setting[_]] = Seq(
-  scapegoatVersion in ThisBuild := "1.3.6",
+  scapegoatVersion in ThisBuild := "1.3.8",
   publishMavenStyle := true,
   publishTo := sonatypePublishTo.value,
   organization := "social.midas",
