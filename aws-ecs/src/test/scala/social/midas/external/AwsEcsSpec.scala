@@ -81,18 +81,6 @@ class AwsEcsSpec extends Specification with ForEach[EcsAsyncClient] {
       response.clusterArns.isEmpty must_== false
     }
 
-    "at least one container instance should be present" >> { client: ECSAsyncClient =>
-      val clusterList = client.listClusters().get
-      val clusterArn = clusterList.clusterArns.get(0)
-
-      val req = ListContainerInstancesRequest.builder()
-        .cluster(clusterArn)
-        .build()
-      val resp = client.listContainerInstances(req).get
-
-      resp.containerInstanceArns.isEmpty must_== false
-    }
-
     "at least one service should be present" >> { client: EcsAsyncClient =>
       val clusterList = client.listClusters().get
       val clusterArn = clusterList.clusterArns.get(0)

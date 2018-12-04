@@ -33,15 +33,4 @@ class EcsClientSpec extends Specification {
       client.listClusters(Some(nonExistentRe)).unsafeRunSync()
     result must be empty
   }
-
-  "listing `containers` and filter on EcsCluster" >> {
-    val prog = for {
-      clusters <- client.listClusters()
-      clusterWithContainers <- client.listContainerInstances(clusters.head)
-    } yield clusterWithContainers
-
-    val result = prog.unsafeRunSync()
-
-    result must not be empty
-  }
 }
