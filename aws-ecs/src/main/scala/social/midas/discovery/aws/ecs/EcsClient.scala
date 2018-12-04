@@ -21,6 +21,7 @@ import scala.collection.JavaConverters._
 import scala.util.matching.Regex
 
 import cats.effect.IO
+import org.apache.logging.log4j.scala.Logging
 import social.midas.discovery.common.{AbstractContext, aws}
 import social.midas.discovery.common.aws.{Arn, ArnLike, AwsClient}
 import software.amazon.awssdk.regions.Region
@@ -36,7 +37,8 @@ import software.amazon.awssdk.services.ecs.model.{
  * [[software.amazon.awssdk.services.ecs.ECSAsyncClient]].
  */
 final case class EcsClient(region: Region)
-    extends AwsClient[EcsAsyncClientBuilder, EcsAsyncClient] {
+    extends AwsClient[EcsAsyncClientBuilder, EcsAsyncClient]
+    with Logging {
 
   def builder = EcsAsyncClient.builder()
 
@@ -62,15 +64,17 @@ final case class EcsClient(region: Region)
     cluster: EcsClusterArn,
     filterArn: Option[Regex] = None,
   ) : IO[Seq[EcsContainerInstanceArn]] = {
+    logger.traceEntry(cluster, filterArn)
     val request = ListContainerInstancesRequest.builder()
       .cluster(cluster.arn.unwrap)
       .build()
-    queryListExtractTransformMatch[ListContainerInstancesResponse, EcsContainerInstanceArn](
+    val res = queryListExtractTransformMatch[ListContainerInstancesResponse, EcsContainerInstanceArn](
       _.listContainerInstances(request),
       _.containerInstanceArns,
       x => EcsContainerInstanceArn(Arn(x), cluster),
       filterArn,
     )
+    logger.traceExit(res)
   }
 
   /**
@@ -134,6 +138,7 @@ final case class EcsClient(region: Region)
     cluster: EcsClusterArn,
     instances: Seq[Arn],
   ): IO[Seq[EcsContainerInstance]] = {
+
     val request = DescribeContainerInstancesRequest.builder()
       .cluster(cluster.arn.unwrap)
       .containerInstances(instances.map(_.arn.unwrap).asJava)

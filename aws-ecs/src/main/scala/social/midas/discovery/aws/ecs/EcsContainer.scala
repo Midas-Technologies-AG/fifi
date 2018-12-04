@@ -40,6 +40,7 @@ final case class EcsContainer(
   arn: Arn,
   clusterArn: EcsClusterArn,
   networkBindings: Seq[EcsNetworkBinding],
+  // networkInterfaces: Seq[EcsNetworkInterfaces],
 )
 
 object EcsContainer {

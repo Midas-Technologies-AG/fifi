@@ -17,9 +17,10 @@ package social.midas.discovery.aws.ecs
 
 import io.circe.{ Decoder, Encoder }
 import io.circe.generic.semiauto.{ deriveDecoder, deriveEncoder }
+import org.apache.logging.log4j.scala.Logging
 import sangria.schema.{
   fields, Argument, DeferredValue, Field, ListType, ObjectType,
-  OptionInputType, StringType,
+  OptionType, OptionInputType, StringType,
 }
 import scala.collection.JavaConverters._
 // TODO How can we eliminate this:
@@ -48,29 +49,31 @@ object EcsTaskArn {
 final case class EcsTask(
   arn: Arn,
   clusterArn: EcsClusterArn,
-  containerInstance: EcsContainerInstanceArn,
+  containerInstance: Option[EcsContainerInstanceArn],
   containers: Seq[EcsContainer],
   group: String,
 ) extends ArnLike {
   def getFullArn = EcsTaskArn(arn, clusterArn)
 }
 
-object EcsTask {
+object EcsTask extends Logging {
   implicit val dec: Decoder[EcsTask] = deriveDecoder[EcsTask]
   implicit val enc: Encoder[EcsTask] = deriveEncoder[EcsTask]
 
 
-  def apply(task: Task): EcsTask =
-    EcsTask(
+  def apply(task: Task): EcsTask = {
+    logger.traceEntry(task)
+    val res = EcsTask(
       Arn(task.taskArn()),
       EcsClusterArn(task.clusterArn()),
-      EcsContainerInstanceArn(
-        task.containerInstanceArn(),
-        task.clusterArn(),
+      Option(task.containerInstanceArn()).map(
+        EcsContainerInstanceArn(_, task.clusterArn())
       ),
       containers = task.containers().asScala.toSeq.map(x => EcsContainer(task.clusterArn(), x)),
       group      = task.group(),
     )
+    logger.traceExit(res)
+  }
 
   implicit val Type = ObjectType(
     "EcsTask",
@@ -78,7 +81,7 @@ object EcsTask {
     fields[AbstractContext, EcsTaskArn](
       Field("arn", Arn.Type, resolve = _.value.arn),
       Field("clusterArn", EcsClusterArn.Type, resolve = _.value.clusterArn),
-      Field("containerInstance", EcsContainerInstanceArn.Type,
+      Field("containerInstance", OptionType(EcsContainerInstanceArn.Type),
         description = Some("The container instance that hosts the task."),
         resolve = ctx => DeferredValue(
           Fetchers.ecsTaskDescriptions.defer(ctx.value)
