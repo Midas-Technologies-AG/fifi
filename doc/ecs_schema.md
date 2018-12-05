@@ -79,7 +79,7 @@ type EcsTask {
   clusterArn: String!
 <BLANKLINE>
   "The container instance that hosts the task."
-  containerInstance: EcsContainerInstance!
+  containerInstance: EcsContainerInstance
 <BLANKLINE>
   "The containers associated with the task."
   containers: [EcsContainer!]!

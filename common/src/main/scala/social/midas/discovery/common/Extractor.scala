@@ -58,7 +58,10 @@ abstract class Extractor
   ): Acc = {
     logger.traceEntry(path, ctx, tpe)
     logger.traceExit(
-      Some({case x: A @unchecked => Seq(x)})
+      Some({case x: A @unchecked => {
+        logger.traceEntry(s"${x}")
+        logger.traceExit(Seq(x))
+      }})
     )
   }
 
@@ -81,16 +84,30 @@ abstract class Extractor
         (ExecutionPath, List[Argument[_]], Vector[AstArgument])
       => Try[sangria.schema.Args],
   ): Acc = {
-    logger.traceEntry(
-      fieldAcc, childrenAcc, path, ctx, astFields,
-      parentType, field, argumentValuesFn,
+    logger.traceEntry(s"""
+fieldAcc:         ${fieldAcc},
+childrenAcc       ${childrenAcc},
+path:             ${path},
+ctx:              ${ctx}, 
+astFields:        ${astFields},
+parentType:       ${parentType},
+field:            ${field},
+argumentValuesFn: ${argumentValuesFn},
+"""
     )
     val wrapChildren: Acc = childrenAcc.map(f => {
       field.fieldType match {
-        case ObjectType(_, _, _, _, _, _, _) =>
-          { case x: ListMap[String,Any] @unchecked =>
-            f(x(field.name))
-            case null => {
+        case ObjectType(_, _, _, _, _, _, _) => {
+          case x: ListMap[String,Any] @unchecked => {
+            logger.traceEntry(x)
+            logger.debug(s"f: ${f}")
+            val value = x(field.name)
+            logger.debug(s"value: ${value}")
+            val result = f(value)
+            logger.debug(s"result: ${result}")
+            logger.traceExit(result)
+          }
+          case null => {
               logger.error("Matched null");
               logger.error(s"fieldAcc: ${fieldAcc}")
               logger.error(s"childrenAcc: ${childrenAcc}")
@@ -103,18 +120,29 @@ abstract class Extractor
               throw new Exception("Unexpected null")
             }
           }
-        case OptionType(_) =>
-          { case x: ListMap[String,Any] @unchecked => {
+        case OptionType(ScalarType(_,_,_,_,_,_,_,_,_)) => {
+          // The value is extracted by the `here` function (see below)
+          case x: ListMap[String,Any] @unchecked => Seq()
+        }
+        case OptionType(_) => {
+          case x: ListMap[String,Any] @unchecked => {
             logger.traceEntry(x)
             val value = Option(x(field.name))
+            logger.debug(s"value: ${value}")
             if (value == None) {
               logger.info(s"Could not find value in path: ${path}")
             }
-            logger.traceExit(value.toSeq.flatMap(f))
-          }}
-        case ListType(_) =>
-          { case x: ListMap[String, Vector[Any]] @unchecked =>
-            x(field.name).map(f).toSeq.flatten }
+            val result = value.toSeq.flatMap(f)
+            logger.debug(s"result: ${result}")
+            logger.traceExit(result)
+          }
+        }
+        case ListType(_) => {
+          case x: ListMap[String, Vector[Any]] @unchecked => {
+            logger.traceEntry(x)
+            logger.traceExit(x(field.name).map(f).toSeq.flatten)
+          }
+        }
         case _ => f
       }
     })
@@ -122,7 +150,12 @@ abstract class Extractor
     val here =
       if (field.tags.contains(provides)) {
         val extract: Any => Seq[A] = {
-          case x: ListMap[String,A] @unchecked => Seq(x(field.name))
+          case x: ListMap[String,A] @unchecked => {
+            logger.traceEntry(x)
+            val value = x(field.name)
+            logger.debug(s"value: ${value}")
+            logger.traceExit(Seq(value))
+          }
         }
         Some(extract)
       } else {
