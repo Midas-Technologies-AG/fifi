@@ -118,10 +118,6 @@ query ContainerQuery {
     tasks {
       arn
       clusterArn
-      containerInstance {
-        arn
-        clusterArn
-      }
       containers {
         arn
         clusterArn

@@ -65,7 +65,6 @@ object EcsClusterArn {
  */
 final case class EcsCluster(
   arn: EcsClusterArn,
-  containerInstances: Option[Seq[EcsContainerInstanceArn]] = None,
   services: Option[Seq[EcsServiceArn]] = None,
   tasks: Option[Seq[EcsTaskArn]] = None,
 )
@@ -82,15 +81,6 @@ object EcsCluster {
     "An AWS ECS cluster.",
     fields[AbstractContext, EcsClusterArn](
       Field("arn", Arn.Type, resolve = _.value.arn),
-      Field(
-        "containerInstances",
-        ListType(EcsContainerInstanceArn.Type),
-        arguments = Arn.Filter :: Nil,
-        description = Some("The list of containers of this cluster matching filterArn if specified."),
-        resolve = { ctx =>
-          EcsClient(ctx.ctx).listContainerInstances(ctx.value, ctx.arg(Arn.Filter)).unsafeToFuture()
-        },
-      ),
       Field(
         "services",
         ListType(EcsServiceArn.Type),

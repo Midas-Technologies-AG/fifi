@@ -18,6 +18,7 @@ package social.midas.discovery.aws
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification
 import sangria.macros._
+import scala.collection.immutable.{ ListMap, Vector }
 import scala.concurrent.duration._
 import scala.concurrent.Await
 
@@ -28,6 +29,31 @@ import social.midas.test.Regex.Ip4Regex
 class ExtractorsSpec(implicit ee: ExecutionEnv) extends Specification {
 
   "ip4Extractor" >> {
+    "on constructed result" >> {
+      val query = graphql"""
+query {
+  ec2Instances {
+    privateIpAddress
+  }
+}
+"""
+      val fut = common.prepareQuery(
+        query, extractors=List(Ip4Extractor),
+      )
+      val prepared = Await.result(fut, 10.seconds)
+      prepared.userContext.extractor must beSome
+      val extractor = prepared.userContext.extractor.get
+      val example =
+        ListMap("data"
+          -> ListMap("ec2Instances"
+            -> Vector(ListMap("privateIpAddress" -> "0.0.0.0"))))
+
+      val extracted = extractor(example).asInstanceOf[Seq[String]]
+      extracted must not be empty
+      extracted must_=== Seq("0.0.0.0")
+    }
+
+
     "on real world" >> {
       val query = graphql"""
 query {

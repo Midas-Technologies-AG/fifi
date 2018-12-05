@@ -120,10 +120,6 @@ argumentValuesFn: ${argumentValuesFn},
               throw new Exception("Unexpected null")
             }
           }
-        case OptionType(ScalarType(_,_,_,_,_,_,_,_,_)) => {
-          // The value is extracted by the `here` function (see below)
-          case x: ListMap[String,Any] @unchecked => Seq()
-        }
         case OptionType(_) => {
           case x: ListMap[String,Any] @unchecked => {
             logger.traceEntry(x)

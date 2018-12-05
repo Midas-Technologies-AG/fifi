@@ -39,6 +39,5 @@ object EcsSchema extends AbstractSchema {
 
   override val fetchers = Seq(
     Fetchers.ecsTaskDescriptions,
-    Fetchers.ecsContainerInstances,
   )
 }

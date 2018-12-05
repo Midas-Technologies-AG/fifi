@@ -20,7 +20,7 @@ import io.circe.generic.semiauto.{ deriveDecoder, deriveEncoder }
 import org.apache.logging.log4j.scala.Logging
 import sangria.schema.{
   fields, Argument, DeferredValue, Field, ListType, ObjectType,
-  OptionType, OptionInputType, StringType,
+  OptionInputType, StringType,
 }
 import scala.collection.JavaConverters._
 // TODO How can we eliminate this:
@@ -49,7 +49,6 @@ object EcsTaskArn {
 final case class EcsTask(
   arn: Arn,
   clusterArn: EcsClusterArn,
-  containerInstance: Option[EcsContainerInstanceArn],
   containers: Seq[EcsContainer],
   group: String,
 ) extends ArnLike {
@@ -66,9 +65,6 @@ object EcsTask extends Logging {
     val res = EcsTask(
       Arn(task.taskArn()),
       EcsClusterArn(task.clusterArn()),
-      Option(task.containerInstanceArn()).map(
-        EcsContainerInstanceArn(_, task.clusterArn())
-      ),
       containers = task.containers().asScala.toSeq.map(x => EcsContainer(task.clusterArn(), x)),
       group      = task.group(),
     )
@@ -81,12 +77,6 @@ object EcsTask extends Logging {
     fields[AbstractContext, EcsTaskArn](
       Field("arn", Arn.Type, resolve = _.value.arn),
       Field("clusterArn", EcsClusterArn.Type, resolve = _.value.clusterArn),
-      Field("containerInstance", OptionType(EcsContainerInstanceArn.Type),
-        description = Some("The container instance that hosts the task."),
-        resolve = ctx => DeferredValue(
-          Fetchers.ecsTaskDescriptions.defer(ctx.value)
-        ).map(_.containerInstance),
-      ),
       Field("containers",
         ListType(EcsContainer.Type),
         description = Some("The containers associated with the task."),

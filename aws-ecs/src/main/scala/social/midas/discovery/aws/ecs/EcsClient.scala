@@ -27,9 +27,9 @@ import social.midas.discovery.common.aws.{Arn, ArnLike, AwsClient}
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.ecs.{EcsAsyncClient, EcsAsyncClientBuilder}
 import software.amazon.awssdk.services.ecs.model.{
-  DescribeContainerInstancesRequest, DescribeTasksRequest, ListClustersResponse,
-  ListContainerInstancesRequest, ListContainerInstancesResponse, ListServicesRequest,
-  ListServicesResponse, ListTasksRequest, ListTasksResponse,
+  DescribeTasksRequest, ListClustersResponse,
+  ListServicesRequest, ListServicesResponse,
+  ListTasksRequest, ListTasksResponse,
 }
 
 /**
@@ -54,28 +54,6 @@ final case class EcsClient(region: Region)
       EcsClusterArn(_),
       filterArn
     )
-
-  /**
-   * List ARNs of container instances related to `cluster` and filter
-   * the result by `filterArn`. Note that filtering happens
-   * post-fetch.
-   */
-  def listContainerInstances(
-    cluster: EcsClusterArn,
-    filterArn: Option[Regex] = None,
-  ) : IO[Seq[EcsContainerInstanceArn]] = {
-    logger.traceEntry(cluster, filterArn)
-    val request = ListContainerInstancesRequest.builder()
-      .cluster(cluster.arn.unwrap)
-      .build()
-    val res = queryListExtractTransformMatch[ListContainerInstancesResponse, EcsContainerInstanceArn](
-      _.listContainerInstances(request),
-      _.containerInstanceArns,
-      x => EcsContainerInstanceArn(Arn(x), cluster),
-      filterArn,
-    )
-    logger.traceExit(res)
-  }
 
   /**
    * List service ARNs related to `cluster` and filter the result by
@@ -128,25 +106,6 @@ final case class EcsClient(region: Region)
       .build()
     withClient(_.describeTasks(request)).map(
       _.tasks.asScala.toSeq.map(EcsTask.apply)
-    )
-  }
-
-  /**
-   * Fetches descriptions of container `instances` on `cluster`.
-   */
-  def describeContainerInstances(
-    cluster: EcsClusterArn,
-    instances: Seq[Arn],
-  ): IO[Seq[EcsContainerInstance]] = {
-
-    val request = DescribeContainerInstancesRequest.builder()
-      .cluster(cluster.arn.unwrap)
-      .containerInstances(instances.map(_.arn.unwrap).asJava)
-      .build()
-    withClient(_.describeContainerInstances(request)).map(
-      _.containerInstances.asScala.toSeq.map(
-        EcsContainerInstance(cluster, _)
-      )
     )
   }
 

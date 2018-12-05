@@ -46,30 +46,4 @@ object Fetchers {
         .map(restoreOrder(tasks))
     }
   )
-
-  implicit val EcsContainerInstanceId =
-    HasId[EcsContainerInstance, EcsContainerInstanceArn](_.getArnPath)
-
-  val ecsContainerInstances: Fetcher[
-    AbstractContext,
-    EcsContainerInstance,
-    EcsContainerInstance,
-    EcsContainerInstanceArn
-  ] = Fetcher[
-    AbstractContext,
-    EcsContainerInstance,
-    EcsContainerInstanceArn,
-  ]( (ctx: AbstractContext, instances: Seq[EcsContainerInstanceArn]) => {
-    val byCluster = instances.groupBy(_.clusterArn)
-    Future.traverse(byCluster.toSeq)({
-      case (cluster, instancesOfCluster) => {
-        val arns = instancesOfCluster.map(_.arn)
-        val client = EcsClient(ctx)
-        client.describeContainerInstances(cluster, arns).unsafeToFuture()
-      }
-    })
-      .map(_.flatten.toSeq)
-      .map(restoreOrder(instances))
-    }
-  )
 }

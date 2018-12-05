@@ -16,20 +16,9 @@ schema {
   query: RootObject
 }
 <BLANKLINE>
-"Describes an EC2 instance."
-type Ec2Instance {
-  id: String!
-  privateIpAddress: String
-}
-<BLANKLINE>
 "An AWS ECS cluster."
 type EcsCluster {
   arn: String!
-<BLANKLINE>
-  "The list of containers of this cluster matching filterArn if specified."
-  containerInstances(
-    "Filter ARNs by matching to a regular expression."
-    filterArn: String): [EcsContainerInstance!]!
 <BLANKLINE>
   "The list of services of this cluster matching filterArn if specified."
   services(
@@ -52,13 +41,6 @@ type EcsContainer {
   networkBindings: [EcsNetworkBinding!]!
 }
 <BLANKLINE>
-"An EC2 instance that is running the Amazon ECS agent and has been registered with a cluster."
-type EcsContainerInstance {
-  arn: String!
-  clusterArn: String!
-  ec2Instance: Ec2Instance!
-}
-<BLANKLINE>
 "Details on the network bindings between a container and its host container instance."
 type EcsNetworkBinding {
   protocol: String!
@@ -77,9 +59,6 @@ type EcsServiceArn {
 type EcsTask {
   arn: String!
   clusterArn: String!
-<BLANKLINE>
-  "The container instance that hosts the task."
-  containerInstance: EcsContainerInstance
 <BLANKLINE>
   "The containers associated with the task."
   containers: [EcsContainer!]!
