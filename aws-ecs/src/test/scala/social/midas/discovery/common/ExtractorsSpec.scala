@@ -23,8 +23,7 @@ import scala.concurrent.duration._
 import scala.concurrent.Await
 
 import social.midas.discovery.common
-import social.midas.discovery.common.{ Ip4Extractor, SchemaFinder }
-import social.midas.test.Regex.Ip4Regex
+import social.midas.discovery.common.Ip4Extractor
 
 class ExtractorsSpec(implicit ee: ExecutionEnv) extends Specification {
 
@@ -43,8 +42,6 @@ query {
   }
 }
 """
-      val (root, resolver) =
-        SchemaFinder(common.defaultContext).findRootAndResolver()
       val fut = common.prepareQuery(
         query, extractors=List(Ip4Extractor),
       )
@@ -60,31 +57,6 @@ query {
       val extractor = result.userContext.extractor.get
       val extracted = extractor(example)
       extracted must_=== Seq("0.0.0.0")
-    }
- 
-    "on real world" >> {
-      val query = graphql"""
-query {
-  ecsClusters {
-    tasks {
-      containerInstance {
-        ec2Instance {
-          privateIpAddress
-        }
-      }
-    }
-  }
-}
-"""
-      val fut = common.prepareQuery(
-        query, extractors=List(Ip4Extractor),
-      )
-      val prepared = Await.result(fut, 10.seconds)
-      val extractor = prepared.userContext.extractor.get
-      val result = Await.result(prepared.execute(), 10.seconds)
-      val extracted = extractor(result).asInstanceOf[Seq[String]]
-      extracted must not be empty
-      extracted must contain(matching(Ip4Regex)).foreach
     }
   }
 }

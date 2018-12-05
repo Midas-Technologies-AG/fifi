@@ -40,6 +40,7 @@ query {
         query, extractors=List(Ip4Extractor),
       )
       val prepared = Await.result(fut, 10.seconds)
+      prepared.userContext.extractor must beSome
       val extractor = prepared.userContext.extractor.get
       val result = Await.result(prepared.execute(), 10.seconds)
       val extracted = extractor(result).asInstanceOf[Seq[String]]

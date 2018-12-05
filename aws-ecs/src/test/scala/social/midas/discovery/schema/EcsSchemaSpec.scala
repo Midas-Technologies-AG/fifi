@@ -26,7 +26,6 @@ import scala.util.matching.Regex
 
 import social.midas.discovery.common
 import social.midas.discovery.aws.ecs.{ EcsCluster, EcsTask }
-import social.midas.test.Regex.Ip4Regex
 
 class EcsSchemaSpec(implicit ee: ExecutionEnv) extends Specification {
 
@@ -149,62 +148,6 @@ query ContainerQuery {
 
       parsed must beRight
       parsed.right.get must not be empty
-    }
-
-    "get private ip address of a task" >> {
-      val query = graphql"""
-query {
-  ecsClusters {
-    tasks {
-      containerInstance {
-        ec2Instance {
-          privateIpAddress
-        }
-      }
-    }
-  }
-}
-"""
-
-      val fut = common.executeQuery(query)
-      val doc: Json = Await.result(fut, 10.second)
-      val parsed = doc.hcursor.downField("data")
-        .downField("ecsClusters")
-        .downArray
-        .downField("tasks")
-        .downArray.downField("containerInstance")
-        .downField("ec2Instance")
-        .downField("privateIpAddress")
-        .as[String]
-
-      parsed must beRight
-      parsed.right.get must be matching Ip4Regex
-    }
-
-    "resolve instances ip address" >> {
-      val query = graphql"""
-query ContainerQuery {
-  ecsClusters {
-    containerInstances {
-      ec2Instance {
-        privateIpAddress
-      }
-    }
-  }
-}
-"""
-      val fut = common.executeQuery(query)
-      val doc: Json = Await.result(fut, 10.second)
-      val cursor = doc.hcursor
-      val parsed = cursor.downField("data")
-        .downField("ecsClusters")
-        .downArray.downField("containerInstances")
-        .downArray.downField("ec2Instance")
-        .downField("privateIpAddress")
-        .as[String]
-
-      parsed must beRight
-      parsed.right.get must be matching Ip4Regex
     }
   }
 }
