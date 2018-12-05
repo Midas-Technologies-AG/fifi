@@ -42,7 +42,6 @@ val minimalSettings: Seq[Def.Setting[_]] = Seq(
   releaseProcess ++= Seq(
     releaseStepCommand("sonatypeRelease"),
   ),
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   apiURL := Some(
     url(s"https://oss.sonatype.org/service/local/repositories/releases/archive/social/midas/${name.value}_${Versions.scalaMain}/${version.value}/${name.value}_${Versions.scalaMain}-${version.value}-javadoc.jar/!/")
   ),

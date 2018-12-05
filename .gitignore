@@ -8,5 +8,5 @@ target/
 .ensime
 .ensime_cache
 
-# Ignore pgp settings:
-project/pgp.sbt
+# Ignore gpg settings:
+project/gpg.sbt
