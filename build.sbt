@@ -193,7 +193,7 @@ lazy val log4jApi       = "org.apache.logging.log4j" %  "log4j-api"        % log
 lazy val log4jApiScala  = "org.apache.logging.log4j" %% "log4j-api-scala"  % "11.0"                 // https://search.maven.org/search?q=g:org.apache.logging.log4j%20AND%20a:log4j-api-scala_2.12&core=gav
 lazy val log4jCore      = "org.apache.logging.log4j" %  "log4j-core"       % "2.11.1"               // https://search.maven.org/search?q=g:org.apache.logging.log4j%20AND%20a:log4j-core&core=gav
 lazy val log4jSlf4jImpl = "org.apache.logging.log4j" %  "log4j-slf4j-impl" % log4jCore.revision
-lazy val awsSdkAwsCore  = "software.amazon.awssdk"   %  "aws-core"         % "2.1.3"                // https://search.maven.org/search?q=g:software.amazon.awssdk%20AND%20a:regions&core=gav
+lazy val awsSdkAwsCore  = "software.amazon.awssdk"   %  "aws-core"         % "2.1.4"                // https://search.maven.org/search?q=g:software.amazon.awssdk%20AND%20a:regions&core=gav
 lazy val awsSdkCore     = "software.amazon.awssdk"   %  "core"             % awsSdkAwsCore.revision
 lazy val awsSdkEc2      = "software.amazon.awssdk"   %  "ec2"              % awsSdkAwsCore.revision
 lazy val awsSdkEcs      = "software.amazon.awssdk"   %  "ecs"              % awsSdkAwsCore.revision
