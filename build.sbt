@@ -183,8 +183,8 @@ lazy val `root` = (project in file("."))
     `discovery-aws-ecs`,
   )
 
-lazy val catsEffect     = "org.typelevel"            %% "cats-effect"      % "1.1.0"                // https://search.maven.org/search?q=g:org.typelevel%20AND%20a:cats-effect_2.12&core=gav
-lazy val circeCore      = "io.circe"                 %% "circe-core"       % "0.11.0"               // https://search.maven.org/search?q=g:io.circe%20AND%20a:circe-core_2.12&core=gav
+lazy val catsEffect     = "org.typelevel"            %% "cats-effect"      % "1.2.0"                // https://search.maven.org/search?q=g:org.typelevel%20AND%20a:cats-effect_2.12&core=gav
+lazy val circeCore      = "io.circe"                 %% "circe-core"       % "0.11.1"               // https://search.maven.org/search?q=g:io.circe%20AND%20a:circe-core_2.12&core=gav
 lazy val circeGeneric   = "io.circe"                 %% "circe-generic"    % circeCore.revision
 lazy val circeLiteral   = "io.circe"                 %% "circe-literal"    % circeCore.revision
 lazy val circeParser    = "io.circe"                 %% "circe-parser"     % circeCore.revision
@@ -193,7 +193,7 @@ lazy val log4jApi       = "org.apache.logging.log4j" %  "log4j-api"        % log
 lazy val log4jApiScala  = "org.apache.logging.log4j" %% "log4j-api-scala"  % "11.0"                 // https://search.maven.org/search?q=g:org.apache.logging.log4j%20AND%20a:log4j-api-scala_2.12&core=gav
 lazy val log4jCore      = "org.apache.logging.log4j" %  "log4j-core"       % "2.11.1"               // https://search.maven.org/search?q=g:org.apache.logging.log4j%20AND%20a:log4j-core&core=gav
 lazy val log4jSlf4jImpl = "org.apache.logging.log4j" %  "log4j-slf4j-impl" % log4jCore.revision
-lazy val awsSdkAwsCore  = "software.amazon.awssdk"   %  "aws-core"         % "2.2.0"                // https://search.maven.org/search?q=g:software.amazon.awssdk%20AND%20a:regions&core=gav
+lazy val awsSdkAwsCore  = "software.amazon.awssdk"   %  "aws-core"         % "2.4.1"                // https://search.maven.org/search?q=g:software.amazon.awssdk%20AND%20a:regions&core=gav
 lazy val awsSdkCore     = "software.amazon.awssdk"   %  "core"             % awsSdkAwsCore.revision
 lazy val awsSdkEc2      = "software.amazon.awssdk"   %  "ec2"              % awsSdkAwsCore.revision
 lazy val awsSdkEcs      = "software.amazon.awssdk"   %  "ecs"              % awsSdkAwsCore.revision
@@ -206,6 +206,6 @@ lazy val sangriaCirce   = "org.sangria-graphql"      %% "sangria-circe"    % "1.
 lazy val junitInterface   = "com.novocode"           %  "junit-interface"    % "0.11"              // https://search.maven.org/search?q=g:com.novocode%20AND%20a:junit-interface&core=gav
 lazy val scalaJava8Compat = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.0"             // https://search.maven.org/search?q=g:org.scala-lang.modules%20AND%20a:scala-java8-compat_2.12&core=gav
 lazy val scalacheck       = "org.scalacheck"         %% "scalacheck"         % "1.14.0"            // https://search.maven.org/search?q=g:org.scalacheck%20AND%20a:scalacheck_2.12&core=gav
-lazy val specs2Core       = "org.specs2"             %% "specs2-core"        % "4.3.6"             // https://search.maven.org/search?q=g:org.specs2%20AND%20a:specs2-core_2.12&core=gav
+lazy val specs2Core       = "org.specs2"             %% "specs2-core"        % "4.4.1"             // https://search.maven.org/search?q=g:org.specs2%20AND%20a:specs2-core_2.12&core=gav
 lazy val specs2Junit      = "org.specs2"             %% "specs2-junit"       % specs2Core.revision
 lazy val specs2Scalacheck = "org.specs2"             %% "specs2-scalacheck"  % specs2Core.revision

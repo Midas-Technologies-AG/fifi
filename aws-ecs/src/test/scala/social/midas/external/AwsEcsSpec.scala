@@ -63,15 +63,9 @@ class AwsEcsSpec extends Specification with ForEach[EcsAsyncClient] {
   "ClusterNotFoundException on" >> {
     "`listContainerInstances()`" >> { client: EcsAsyncClient =>
       client.listContainerInstances().get must throwA[ExecutionException]
-        .like({ case exc =>
-          exc.getCause.getMessage() must startWith("Cluster not found.")
-        })
     }
     "`listServices()`" >> { client: EcsAsyncClient =>
       client.listServices().get must throwA[ExecutionException]
-        .like({ case exc =>
-          exc.getCause.getMessage() must startWith("Cluster not found.")
-        })
     }
   }
 
