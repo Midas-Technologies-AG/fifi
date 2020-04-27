@@ -1,6 +1,6 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/social.midas/discovery-common_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/social.midas/discovery-common_2.12) 
 
-# Service Discovery Library #
+# fifi - A Service Discovery Library #
 
 Well, the title says it all: this library is about service discovery
 in general. At the moment it only supports discovering IP addresses
